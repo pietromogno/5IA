@@ -11,18 +11,20 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class Server {
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
         try {
-            System.out.println("The server has started");
+            System.out.println("The server has started.");
             int cNumber = 0;
             ServerSocket socket = new ServerSocket(9090);
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-            while(cNumber <= 100){
-                
+            while (cNumber <= 100) {
+                System.out.println("A new client has connected.");
+                executor.execute(new ConnectClient(socket.accept(), cNumber++));
             }
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
+
     }
 
 }
