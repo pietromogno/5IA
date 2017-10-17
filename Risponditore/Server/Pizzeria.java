@@ -6,8 +6,6 @@
 package server;
 
 import dbutil.UtilDB;
-import java.util.function.Predicate;
-
 /**
  *
  * @author Enrico

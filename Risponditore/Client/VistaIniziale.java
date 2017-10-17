@@ -5,7 +5,6 @@
  */
 package client;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +12,6 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 /**
  *
