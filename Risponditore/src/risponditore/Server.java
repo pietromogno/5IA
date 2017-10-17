@@ -1,6 +1,9 @@
 package risponditore;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
@@ -24,9 +27,7 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 }
 
 class ConnectClient implements Runnable {
@@ -37,12 +38,25 @@ class ConnectClient implements Runnable {
     public ConnectClient(Socket s, int cNumber) {
         this.s = s;
         this.cNumber = cNumber;
-        System.out.println("Connesso al client " + cNumber + " sul socket " + s);
+        System.out.println("Connesso al client " + cNumber + " sul socket " + s.toString());
     }
 
     @Override
     public void run() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            boolean conversazioneFinita = false;
+            Risponditore automa = new Risponditore();
+            PrintWriter writer = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            while (!conversazioneFinita) {
+                writer.println(automa.getCurrentState() + "\n" + automa.getPossibleAnswers());
+                int input = reader.read();
+                automa.executeUpdate(input);
+                conversazioneFinita = automa.isConversationEnded();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
 }
