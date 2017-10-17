@@ -1,4 +1,4 @@
-#Risponditore automatico in Java
+# Risponditore automatico in Java
 Il progetto del risponditore contiene tre file:
 ```
 Pizzeria.java
@@ -22,6 +22,6 @@ Client.java
 ```
 E' il file che contiene la classe client e comunica con il server tramite socket: prendendo tutti gli input del cliente e mandandolo al server.
 
-##Strumenti utilizzati per lo sviluppo del progetto
+## Strumenti utilizzati per lo sviluppo del progetto
 - NetBeans (per scrivere il codice e testarlo)
 - StarUml (per realizzare il diagramma di attività della macchina a stati finiti)
