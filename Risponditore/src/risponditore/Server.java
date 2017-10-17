@@ -14,15 +14,17 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class Server {
 
-    public void main(String[] args) {
+    public static void main(String[] args) {
         try {
             System.out.println("The server has started.");
             int cNumber = 0;
-            ServerSocket socket = new ServerSocket(9090);
+            ServerSocket sckListener = new ServerSocket(9090);
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
             while (cNumber <= 100) {
+                Socket socket = sckListener.accept();
+                cNumber++;
+                executor.execute(new ConnectClient(socket));
                 System.out.println("A new client has connected.");
-                executor.execute(new ConnectClient(socket.accept(), cNumber++));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -30,15 +32,13 @@ public class Server {
     }
 }
 
-class ConnectClient implements Runnable {
+class ConnectClient implements Runnable /*extends Thread*/ {
 
     private final Socket s;
-    private final int cNumber;
 
-    public ConnectClient(Socket s, int cNumber) {
+    public ConnectClient(Socket s) {
         this.s = s;
-        this.cNumber = cNumber;
-        System.out.println("Connesso al client " + cNumber + " sul socket " + s.toString());
+        System.out.println("Connesso al client sul socket " + s.toString());
     }
 
     @Override
@@ -50,10 +50,11 @@ class ConnectClient implements Runnable {
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             while (!conversazioneFinita) {
                 writer.println(automa.getCurrentState() + "\n" + automa.getPossibleAnswers());
-                int input = reader.read();
-                automa.executeUpdate(input);
+                String input = reader.readLine();
+                automa.executeUpdate(Integer.parseInt(input));
                 conversazioneFinita = automa.isConversationEnded();
             }
+            writer.print("exit");
         } catch (IOException ex) {
             ex.printStackTrace();
         }

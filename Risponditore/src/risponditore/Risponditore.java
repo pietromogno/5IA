@@ -1,5 +1,7 @@
 package risponditore;
 
+import javax.swing.JOptionPane;
+
 /**
  * @author Emanuele Pagotto
  */
@@ -58,8 +60,9 @@ public class Risponditore {
     public String getPossibleAnswers(){
         String ris = "";
         for(int i = 0; i < current.answers.length;i++){
-            ris += i + ": " + current.answers[i]+", ";
+            ris += i + ":" + current.answers[i]+", ";
         }
+        ris = ris.substring(0, ris.length()-1);
         return ris;
     }
     
@@ -68,9 +71,7 @@ public class Risponditore {
     }
 
     public void executeUpdate(int input) {
-        switch(current.nodeId){
-            
-        }
-        current = automa[current.nodeId][input];
+        //current = automa[current.nodeId][input];
+        JOptionPane.showMessageDialog(null, "Diocane!", "Macello!", JOptionPane.ERROR_MESSAGE);
     }
 }
