@@ -8,16 +8,16 @@ La chat terminerà quando l'utente deciderà di chiudere la sessione.
 
 La macchina a stati finiti è stata realizzata tramite una matrice nel seguente modo costituita:
 
- Posizione [0][0] = id Nodo
- Posizione [0][1] = domanda/risposta
- Posizione [0][2] = id prossimo nodo (risposta positiva o prima scelta tra le opzioni proposte all'utente)
+ Posizione [0][0] = id Nodo,
+ Posizione [0][1] = domanda/risposta,
+ Posizione [0][2] = id prossimo nodo (risposta positiva o prima scelta tra le opzioni proposte all'utente),
  Posizione [0][3] (facoltativa) = id prossimo nodo (risposta negativa o seconda scelta tra le opzioni proposte all'utente)
 
 La matrice è una matrice di stringhe. 
 
 Per memorizzare le risposte dell'utente è stata usata una matrice di stringhe di grandezza 3x2 memorizzando:
 
- Posizione [0][0] = campo 
+ Posizione [0][0] = campo, 
  Posizione [0][1] = risposta utente
 
 il Server utilizza il multiThreading estendendo la classe Thread di Java e ObjectInputStream/Output per comunicare con il client.
