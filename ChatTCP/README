@@ -1,0 +1,3 @@
+La chat avviene tra due client (con grafica) che possono registrarsi ed eseguire il login tramite un DB,
+la comunicazione è gestita dal server.
+Il progetto risulta funzionante.
