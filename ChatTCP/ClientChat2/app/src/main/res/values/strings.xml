@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">YourChat</string>
+
+    <string name="prompt_user">Nome utente</string>
+    <string name="name">Nome</string>
+    <string name="action_delete">Elimina account</string>
+    <string name="surname">Cognome</string>
+    <string name="delete_message">Ci dispiace che te ne voglia andare </string>
+    <string name="button_delete">Elimina account</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_log_in">ACCEDI</string>
+    <string name="action_update_chat">Aggiorna chat</string>
+    <string name="action_log_out">Esci</string>
+    <string name="action_sign_in">REGISTRATI</string>
+    <string name="button_send">Invio</string>
+    <string name="error_invalid_password">La password non è corretta</string>
+    <string name="error_invalid_password2">Le password devono essere uguali</string>
+    <string name="error_invalid_user">Il nome utente non è corretto</string>
+    <string name="error_field_required">Compila i campi evidenziati</string>
+    <string name="linkRegistrazione">Se non sei ancora registrato, registrati</string>
+    <string name="header">Benveuto, effettua l\'accesso!</string>
+    <string name="link_accedi">Se sei già registrato, accedi</string>
+    <string name="headerReg">Benveuto nell\'app! \n Registrati qui sotto</string>
+    <string name="user_not_match">Il nome utente può contenere solo lettere, numeri e deve essere lungo almeno 4 caratteri</string>
+    <string name="title_activity_chat">Bentornato</string>
+    <string name="headUserList">Utenti registrati:</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+</resources>
