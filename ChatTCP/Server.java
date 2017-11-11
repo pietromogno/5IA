@@ -11,74 +11,123 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @brief @author Piergiorgio
- * @date 28/10/2017
+ * @author Piergiorgio Favaretto
+ * @date 10/11/2017
  * @version 1.0
  */
 public class Server {
 
-    int porta = 1234;
-    String log = "";
+    static int porta = 1234;
+    static HashMap<String, Socket> h = new HashMap<>();
+    static ArrayList<String> connessi = new ArrayList<>();
 
-    Server() throws Exception {
-        int clientNumber = 0;
-        ServerSocket listener = new ServerSocket(porta);
+    public static void main(String[] args) throws IOException {
+        ServerSocket srvSocket = new ServerSocket(porta);
+        ExecutorService esecutore = Executors.newCachedThreadPool();
         try {
             while (true) {
-                // crea il thread e lo lancia
-                new Capitalizer(listener.accept(), clientNumber++).start();
+                Socket sock = srvSocket.accept();
+                esecutore.submit(new NuovoClient(sock));
             }
         } finally {
-            listener.close();
+            esecutore.shutdown();
+            srvSocket.close();
+        }
+    }
+}
+
+class NuovoClient implements Runnable {
+
+    private PrintWriter writer;
+    private BufferedReader reader;
+    private Socket sock;
+    private String username = "", notifica, password;
+    private PrintWriter writer2, wrAggiorna;
+    private static SQLHelper s;
+
+    public NuovoClient(Socket sock) {
+        this.sock = sock;
+        try {
+            writer = new PrintWriter(sock.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            s = new SQLHelper();
+        } catch (IOException ex) {
         }
     }
 
-    private class Capitalizer extends Thread {
-
-        private Socket socket;
-        private final int clientNumber;
-        private BufferedReader in;
-        private PrintWriter out;
-
-        public Capitalizer(Socket socket, int clientNumber) throws IOException {
-            this.socket = socket;
-            this.clientNumber = clientNumber;
-            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.out = new PrintWriter(socket.getOutputStream(), true);
-            this.out.println(log);
-        }
-
-        public void run() {
-            String input;
-            try {
-                while (true) {
-                    input = in.readLine();
-                    if (input.compareTo("DISCONNESSO") == 0) {
-                        socket.close();
-                        break;
+    @Override
+    public void run() {
+        try {
+            boolean ris = false;
+            while (!ris) {
+                notifica = reader.readLine();
+                username = reader.readLine();
+                password = reader.readLine();
+                String avvisi = "Account non presente";
+                if (notifica.equals("login")) {
+                    if (s.esiste(username, password)) {
+                        if (Server.h.containsKey(username)) {
+                            avvisi = "Con questi dati si è gia loggato un qualcun altro";
+                        } else {
+                            ris = true;
+                        }
                     }
-                    //out.println(input.toUpperCase());
+                } else if (notifica.toLowerCase().equals("registrazione")) {
+                    if (!s.presente(username)) {
+                        ris = true;
+                        s.esiste(username, password);
+                    } else {
+                        avvisi = "Username già presente nel DataBase";
+                    }
                 }
-                socket.close(); // log("Couldn't close a socket, what's going on?");
-                myLog("Connection with client# " + clientNumber + " closed");
-            } catch (IOException ex) {
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
+                if (ris) {
+                    avvisi = "#registrazioneok";
+                    Server.h.put(username, sock);
+                    Server.connessi.add(username);
+                }
+                writer.println(avvisi);
+            }
+            aggiornaListe();
+            String[] p;
+            String u = "", mes = "";
+            while (true) {
                 try {
-                    in.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    u = reader.readLine();
+                    p = u.split(" ");
+                    if (u != null && !p[0].equals("#fine") && Server.h.containsKey(u)) {
+                        mes = reader.readLine();
+                        writer2 = new PrintWriter(Server.h.get(u).getOutputStream(), true);
+                        writer2.println(username + ":  " + mes);
+                    } else {
+                        Server.h.remove(p[1]);
+                        Server.connessi.remove(p[1]);
+                        aggiornaListe();
+                    }
+                } catch (Exception e) {
                 }
             }
+        } catch (IOException | SQLException ex) {
+            Logger.getLogger(NuovoClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
 
-        private void myLog(String message) {
-            log += message;
-            System.out.println(log);
+    void aggiornaListe() throws IOException {
+        for (String x : Server.h.keySet()) {
+            wrAggiorna = new PrintWriter(Server.h.get(x).getOutputStream(), true);
+            wrAggiorna.println("#aggiornalalista");
+            for (int j = 0; j < Server.connessi.size(); j++) {
+                wrAggiorna.println(Server.connessi.get(j));
+            }
+            wrAggiorna.println("#fineinviolistconnessi");
         }
     }
 
