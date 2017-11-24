@@ -11,6 +11,8 @@ package Client;
  */
 public class welcomePanel extends javax.swing.JPanel {
 
+    private Client model;
+    
     /**
      * Creates new form welcomePanel
      */

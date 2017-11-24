@@ -13,11 +13,11 @@ import objects.User;
  */
 public class Server {
     
-    private static ArrayList <User> connectedClients;
-
+    private static ArrayList[] connectedClients;
+    
     public static void main(String[] args) {
         try {
-            connectedClients = new ArrayList<>();
+            connectedClients = new ArrayList[]{new ArrayList<String>(), new ArrayList<Socket>()};
             System.out.println("The server has started");
             ExecutorService threadExe = Executors.newCachedThreadPool();
             ServerSocket mainSck = new ServerSocket(9090);
@@ -33,8 +33,13 @@ public class Server {
         }
     }
     
-    protected static void addConnectedUser(User u){
-        connectedClients.add(u);
-        System.out.println("srv: Utente "+u.getUsrName()+" connesso");
+    protected static int addConnectedUser(String n, Socket s){
+        connectedClients[0].add(n);
+        connectedClients[1].add(s);
+        return connectedClients[1].size();
     }
+    
+    /*public static User[] getConnectedUsers(){
+        return (User []) connectedClients.toArray();
+    }*/
 }

@@ -1,22 +1,18 @@
 package objects;
 
-import java.net.Socket;
-
 /**
- * *
  * @author Emanuele Pagotto
  */
 public class Message implements java.io.Serializable {
-
-    String message;
-    String username;
-    String password;
+    String message, username ,password;
     int type; //cambia in base alla funzione che il messaggio deve svolgere. 0 indica login, 1 indica register, 2 indica standardMessage
-    User src, dst; //tramite id si risale al destinatario e il destinatario può sapere da chi arriva al messaggio
+    int src, dst; //tramite id si risale al destinatario e il destinatario può sapere da chi arriva al messaggio
 
-    public Message(String message,User dst,User src) { //Costruttore per standardMessage
+    public Message(String message,int dst,int src) { //Costruttore per standardMessage
         this.message = message;
-        //this.type = 2;
+        this.type = 2;
+        this.src = src;
+        this.dst = dst;
     }
 
     public Message(String username, String password, int t) { //costruttore per messaggi di login o registrazione. true indica una richiesta di registrazione, false di login
@@ -29,10 +25,6 @@ public class Message implements java.io.Serializable {
         return message;
     }
 
-    public int getType() {
-        return type;
-    }
-
     public String getName() {
         return username;
     }
@@ -40,12 +32,20 @@ public class Message implements java.io.Serializable {
     public String getPw() {
         return password;
     }
-
-    public Socket getDest() {
-        return dst.getSocket();
-    }
     
     public String getMessage(){
         return message;
+    }
+
+    public int getType() {
+        return type;
+    }
+    
+    public int getSrc(){
+        return src;
+    }
+    
+    public int getDst(){
+        return dst;
     }
 }
