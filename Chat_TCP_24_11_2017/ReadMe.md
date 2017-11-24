@@ -41,13 +41,13 @@ E' il programma con l'interfaccia grafica usato dall'utente per `acceder, regist
 Il tutto è stato sviluppato seguendo il `MVC`, nel quale `Client.java` funge da modello per tutte le viste. `Client.java` utilizza la classe `messageReceiver.java` (che implementa Runnable) per ricevere i messaggi.
 `Luncher.java` è la classe crea la prima vista con il modello.
 
-# Le viste sono:
+### Le viste sono:
 ```
 - Lonin.fxml
 - Registration.fxml
 - Messaging.fxml
 ```
-#I controllori:
+### I controllori:
 ```
 - loginController.java
 - registrationController.java
