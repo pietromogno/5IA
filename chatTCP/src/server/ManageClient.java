@@ -3,6 +3,7 @@ package server;
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import objects.*;
 
 /**
@@ -14,12 +15,13 @@ class ManageClient implements Runnable {
     private ObjectInputStream in; //stream in input
     private ObjectOutputStream out; //stream in output
     private boolean isLoggedIn;
-    private int clientId;
-
+    private int clientId, lastMessageSent;
+    
     //costruttore
     public ManageClient(Socket sck) {
         s = sck;
         isLoggedIn = false;
+        lastMessageSent = 0;
         System.out.println("Connesso al client sul socket " + s.toString());
         try { //preparo gli stream
             out = new ObjectOutputStream(s.getOutputStream());
@@ -73,6 +75,16 @@ class ManageClient implements Runnable {
             }
         } else { //altrimenti
             out.writeObject("err_Hai già effettuato il login"); //è mona
+        }
+    }
+    
+    public void sendChat() throws SQLException, ClassNotFoundException, IOException{
+        ArrayList<Message> chat = SQLhelper.getMessages(clientId);
+        int messagesToSend = chat.size() - lastMessageSent;
+        out.writeInt(messagesToSend);
+        while(lastMessageSent < messagesToSend){
+            out.writeObject(chat.get(lastMessageSent));
+            lastMessageSent++;
         }
     }
 

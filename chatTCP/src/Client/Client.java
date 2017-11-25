@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +18,7 @@ public class Client {
     private static ObjectInputStream inp;
     private static ObjectOutputStream out;
     private static Socket server;
+    private static ArrayList<Message> chat;
 
     public Client(String address, int port) {
         try {
@@ -53,8 +55,11 @@ public class Client {
         }
     }
     
-    public static void receiveMessage(Message m){
-        System.out.println(m.getName() +": "+m.getMessage());
+    public static void receiveMessages() throws IOException, ClassNotFoundException{
+        int nNewMessages = inp.readInt();
+        for(int i = 0; i < nNewMessages; i++){
+            chat.add((Message) inp.readObject());
+        }
     }
 
     public static void main(String[] args) {
