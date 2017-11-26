@@ -15,10 +15,10 @@ import objects.Message;
  */
 public class Client {
 
-    private static ObjectInputStream inp;
-    private static ObjectOutputStream out;
-    private static Socket server;
-    private static ArrayList<Message> chat;
+    private ObjectInputStream inp;
+    private ObjectOutputStream out;
+    private Socket server;
+    private ArrayList<Message> chat;
 
     public Client(String address, int port) {
         try {
@@ -31,12 +31,12 @@ public class Client {
         }
     }
 
-    public static void register(String userName, String password) throws IOException {
+    public void register(String userName, String password) throws IOException {
         Message m = new Message(userName, password, 1);
         out.writeObject(m);
     }
 
-    public static void login(String userName, String password) {
+    public void login(String userName, String password) {
         try {
             Message m = new Message(userName, password, 0);
             out.writeObject(m);
@@ -47,7 +47,7 @@ public class Client {
 
     }
 
-    public static void sendMessage(String message, int dest) {
+    public void sendMessage(String message, int dest) {
         try {
             out.writeObject(new Message(message, dest, dest));
         } catch (IOException ex) {
@@ -55,28 +55,10 @@ public class Client {
         }
     }
     
-    public static void receiveMessages() throws IOException, ClassNotFoundException{
+    public void receiveMessages() throws IOException, ClassNotFoundException{
         int nNewMessages = inp.readInt();
         for(int i = 0; i < nNewMessages; i++){
             chat.add((Message) inp.readObject());
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            server = new Socket("localhost", 9090);
-            out = new ObjectOutputStream(server.getOutputStream());
-            out.flush();
-            inp = new ObjectInputStream(server.getInputStream());
-            login("MonkeyMan", "aaaa");
-            Scanner t = new Scanner (System.in);
-            System.out.println("Vuoi inviare il messaggio?");
-            String c = t.next();
-            if(c.equals("y")) sendMessage("Ciao",1);
-            System.out.println(inp.readObject());
-            server.close();
-        } catch (IOException | ClassNotFoundException ex) {
-            System.err.println("ops");
         }
     }
 }

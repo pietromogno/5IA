@@ -9,12 +9,12 @@ package Client;
  *
  * @author pago1
  */
-public class login extends javax.swing.JPanel {
+public class Login extends javax.swing.JPanel {
 
     /**
      * Creates new form login
      */
-    public login() {
+    public Login() {
         initComponents();
     }
 
@@ -35,7 +35,7 @@ public class login extends javax.swing.JPanel {
 
         setMaximumSize(new java.awt.Dimension(198, 140));
         setMinimumSize(new java.awt.Dimension(198, 140));
-        setPreferredSize(new java.awt.Dimension(198, 140));
+        setPreferredSize(new java.awt.Dimension(231, 140));
 
         btn_login.setText("Login");
 
@@ -64,7 +64,7 @@ public class login extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 62, Short.MAX_VALUE)
+                        .addGap(0, 95, Short.MAX_VALUE)
                         .addComponent(btn_login))
                     .addComponent(txt_usrNameLog, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(pwLog, javax.swing.GroupLayout.Alignment.TRAILING))

@@ -9,12 +9,12 @@ package Client;
  *
  * @author pago1
  */
-public class welcome extends javax.swing.JPanel {
+public class Welcome extends javax.swing.JPanel {
 
     /**
      * Creates new form login
      */
-    public welcome() {
+    public Welcome() {
         initComponents();
     }
 
@@ -32,7 +32,7 @@ public class welcome extends javax.swing.JPanel {
 
         setMaximumSize(new java.awt.Dimension(198, 140));
         setMinimumSize(new java.awt.Dimension(198, 140));
-        setPreferredSize(new java.awt.Dimension(198, 140));
+        setPreferredSize(new java.awt.Dimension(231, 140));
 
         btn_loginSelect.setText("Login");
         btn_loginSelect.setMaximumSize(new java.awt.Dimension(57, 57));
@@ -59,8 +59,8 @@ public class welcome extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btn_loginSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
-                .addComponent(btn_registerSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btn_registerSelect, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(

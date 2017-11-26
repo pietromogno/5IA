@@ -9,12 +9,12 @@ package Client;
  *
  * @author pago1
  */
-public class register extends javax.swing.JPanel {
+public class Register extends javax.swing.JPanel {
 
     /**
      * Creates new form login
      */
-    public register() {
+    public Register() {
         initComponents();
     }
 
@@ -37,7 +37,7 @@ public class register extends javax.swing.JPanel {
 
         setMaximumSize(new java.awt.Dimension(198, 140));
         setMinimumSize(new java.awt.Dimension(198, 140));
-        setPreferredSize(new java.awt.Dimension(198, 140));
+        setPreferredSize(new java.awt.Dimension(231, 140));
 
         txt_usrNameReg.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 
@@ -61,7 +61,7 @@ public class register extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 99, Short.MAX_VALUE)
+                        .addGap(0, 132, Short.MAX_VALUE)
                         .addComponent(btn_register))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
