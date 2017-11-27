@@ -30,19 +30,16 @@ public class Client {
         }
     }
 
-    public void register(String userName, String password) throws IOException {
+    public String register(String userName, String password) throws IOException, ClassNotFoundException {
         Message m = new Message(userName, password, 1);
         out.writeObject(m);
+        return (String) inp.readObject();
     }
 
-    public void login(String userName, String password) {
-        try {
+    public String login(String userName, String password) throws IOException, ClassNotFoundException {
             Message m = new Message(userName, password, 0);
             out.writeObject(m);
-            System.out.println(inp.readObject());
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            return (String) inp.readObject();
 
     }
 

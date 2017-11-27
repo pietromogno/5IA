@@ -60,8 +60,12 @@ class ManageClient implements Runnable {
         }
     }
 
-    public void register(Message m) throws SQLException, ClassNotFoundException { //mi registro sul database
-        SQLhelper.register(m.getName(), m.getPw());
+    public void register(Message m) throws SQLException, ClassNotFoundException, IOException { //mi registro sul database
+        if(SQLhelper.register(m.getName(), m.getPw())){
+            out.writeObject("Registrazione effettuata con successo");  
+        }else{
+            out.writeObject("Il nome utente esiste già");
+        }
     }
 
     public void login(Message m) throws SQLException, ClassNotFoundException, IOException { //faccio il login confrontando il database
@@ -71,10 +75,10 @@ class ManageClient implements Runnable {
                 out.writeObject("Login effettuato come " + m.getName() + "(#" + clientId + ")");
                 isLoggedIn = true;
             } else {
-                out.writeObject("err_Dati non corretti"); //ma i dati potrebbero non essere giusti...
+                out.writeObject("Dati non corretti"); //ma i dati potrebbero non essere giusti...
             }
         } else { //altrimenti
-            out.writeObject("err_Hai già effettuato il login"); //è mona
+            out.writeObject("Hai già effettuato il login"); //è mona
         }
     }
     

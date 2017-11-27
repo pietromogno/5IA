@@ -19,8 +19,9 @@ public class SQLhelper {
         return dbConn;
     }
 
-    public static void register(String name, String password) throws SQLException, ClassNotFoundException { //to do, add more data to the account
+    public static boolean register(String name, String password) throws SQLException, ClassNotFoundException { //to do, add more data to the account
         Connection c = connect();
+        boolean registered = true;
         if (!usrNameExist(name)) {
             String qry = "INSERT INTO UTENTI(nomeUtente,password)"
                     + "VALUES(?,?)";
@@ -30,7 +31,9 @@ public class SQLhelper {
             update.executeUpdate();
         } else {
             System.err.println("l'utente esiste già");
+            registered = false;
         }
+        return registered;
     }
 
     private static boolean usrNameExist(String name) throws SQLException, ClassNotFoundException {
