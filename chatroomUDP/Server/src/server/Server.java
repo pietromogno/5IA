@@ -14,8 +14,13 @@ import java.util.logging.Logger;
 public class Server {
 
     public static void main(String[] args) throws SocketException {
-        ServerThread s = new ServerThread();
-        s.start();
+
+        try {
+            ServerThread s = new ServerThread();
+            s.start();
+        } catch (SQLException | ClassNotFoundException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
@@ -26,17 +31,19 @@ class ServerThread extends Thread {
     private DatagramSocket socket;
     private DatagramPacket packet;
     private ArrayList<Utente> utenti;
+    private ArrayList<String> chat;
     private byte[] buffer;
 
-    public ServerThread() throws SocketException {
+    public ServerThread() throws SocketException, SQLException, ClassNotFoundException {
         this("ServerThread");
     }
 
-    public ServerThread(String name) throws SocketException {
+    public ServerThread(String name) throws SocketException, SQLException, ClassNotFoundException {
         socket = new DatagramSocket(PORT);
         byte[] buffer = new byte[1024];
         packet = new DatagramPacket(buffer, buffer.length);
         utenti = new ArrayList<>();
+        chat = UtilDb.getMessages();
     }
 
     @Override
@@ -75,8 +82,7 @@ class ServerThread extends Thread {
         return utenti.get(i).getId();
     }
 
-    private void updateClient(Utente u) throws SQLException, ClassNotFoundException, IOException { //da ottimizzare
-        ArrayList<String> chat = UtilDb.getMessages();
+    private void updateClient(Utente u) throws SQLException, ClassNotFoundException, IOException {
         for (String m : chat) {
             buffer = m.getBytes();
             socket.send(new DatagramPacket(buffer, buffer.length, u.getAddress(), u.getPORT()));
@@ -114,7 +120,8 @@ class ServerThread extends Thread {
         String messaggio = new String(packet.getData());
         int id = getIdByAddress(packet.getAddress());
         UtilDb.inserisciMessaggio(id, messaggio);
-        for(Utente u : utenti){
+        chat.add(id+": "+messaggio);
+        for (Utente u : utenti) {
             updateClient(u);
         }
     }

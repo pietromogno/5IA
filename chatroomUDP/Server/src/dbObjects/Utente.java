@@ -8,7 +8,6 @@ package dbObjects;
 import java.net.InetAddress;
 
 /**
- *
  * @author Pagotto Emanuele
  */
 public class Utente {
