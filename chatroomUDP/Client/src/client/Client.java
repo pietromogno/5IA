@@ -6,54 +6,42 @@
 package client;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.UnknownHostException;
+import java.net.*;
 
 /**
- *
- * @author pago1
+ * @author Pagotto Emanuele
  */
-public class Client extends Thread{
-	
-	private static final int PORT_IN = 4446;
-	private static final int PORT_OUT = 4445;
-	private int id;
-	
-	MulticastSocket socket;
-	InetAddress group;
-	InetAddress server;
-	
-	public Client() throws IOException{
-		server = InetAddress.getByName("localhost");
-		group = InetAddress.getByName("224.0.1.l");
-		socket = new MulticastSocket(PORT_IN);
-		socket.joinGroup(group);
-	}
-	
-	public void run(){
-		boolean continua = true;
-		byte[] buffer = new byte[1024];
-		
-	}
-	
-	public void sendMessage(DatagramPacket p){
-		socket.send(new DatagramPacket);
-	}
-	
-	public void getChat(){
-		
-	}
-	
-	public void login(String usrName, String pw){
-		
-	}
-	
-	public void register(String usrName, String pw){
-		
-	}
-	
-	
+public class Client {
+
+    private static final int PORT_OUT = 4445;
+    private DatagramSocket socket;
+    private String hostname;
+
+    public Client() throws SocketException {
+        this("localhost");
+    }
+
+    public Client(String hostname) throws SocketException {
+        String host = hostname;
+        DatagramSocket socket = new DatagramSocket();
+        MessageReceiver receiver = new MessageReceiver(socket);
+        Thread r = new Thread(receiver);
+        r.start();
+    }
+
+    private void sendMessage(String m) throws IOException {
+        byte[] buffer = m.getBytes();
+        InetAddress dest = InetAddress.getByName(hostname);
+        DatagramPacket message = new DatagramPacket(buffer, buffer.length, dest, PORT_OUT);
+        socket.send(message);
+    }
+
+    public static void main(String[] args) throws SocketException {
+        String host = "localhost";
+        DatagramSocket socket = new DatagramSocket();
+        MessageReceiver receiver = new MessageReceiver(socket);
+        Thread r = new Thread(receiver);
+        r.start();
+    }
+
 }
