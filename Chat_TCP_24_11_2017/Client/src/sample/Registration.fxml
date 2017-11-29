@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="lblTitle" layoutX="242.0" layoutY="66.0" text="Registration">
+         <font>
+            <Font size="30.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblName" layoutX="194.0" layoutY="137.0" text="Name:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblNickName" layoutX="194.0" layoutY="167.0" text="Nickname:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblUserName" layoutX="194.0" layoutY="197.0" text="Username:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPassword" layoutX="194.0" layoutY="227.0" text="Password:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtName" layoutX="333.0" layoutY="132.0" />
+      <TextField fx:id="txtNickName" layoutX="333.0" layoutY="162.0" />
+      <TextField fx:id="txtUsername" layoutX="333.0" layoutY="192.0" />
+      <TextField fx:id="txtPassword" layoutX="333.0" layoutY="222.0" />
+      <Button fx:id="btnRegister" layoutX="195.0" layoutY="271.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="310.0" text="Register &amp; Login" />
+      <Label fx:id="lblError" layoutX="14.0" layoutY="470.0" wrapText="true" />
+   </children>
+</AnchorPane>
