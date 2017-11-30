@@ -1,101 +1,143 @@
-
 package server;
 
-import static server.Pizzeria.StatoPizzeria.ELENCOBIBITE;
-import static server.Pizzeria.StatoPizzeria.ELENCOPANINI;
-import static server.Pizzeria.StatoPizzeria.ELENCOPIZZE;
-import static server.Pizzeria.StatoPizzeria.ORDINAPIZZE;
-import static server.Pizzeria.StatoPizzeria.ORDINAPRODOTTO;
+import static server.Pizzeria.StatoPizzeria.*;
 
 /**
- *
  * @author Matteo Favaro
  */
 public class Pizzeria {
-    
-    public enum StatoPizzeria{
+
+    public enum StatoPizzeria {
+
         INIZIO,
         ORDINAPRODOTTO,
         ELENCOPIZZE,
         ELENCOBIBITE,
-        ELENCOPANINI,
-        ORDINAPANINI,
-        ORDINABIBITE,
-        ORDINAPIZZE,
+        ELENCOPANINO,
+        ORDINAPIZZA,
+        ORDINABIBITA,
+        ORDINAPANINO,
         TERMINA
-        
     }
+
     private StatoPizzeria statoCorrente;
-    String nome;
-    private boolean clienteFinito;
-    
-    public Pizzeria(){
+    /*private*/ String nomeCliente;
+    private boolean hasClienteFinito;
+
+    public Pizzeria() {
         this.statoCorrente = StatoPizzeria.INIZIO;
-        clienteFinito = false;
+        hasClienteFinito = false;
     }
-    public boolean clienteFinito(){
-        return clienteFinito;
+
+    public boolean hasClienteFinito() {
+        return hasClienteFinito;
     }
-    public String messaggio(){
-        String mess="";
-        switch (statoCorrente){
+
+    public String getMessaggio() {
+        String messaggio = "";
+        switch (statoCorrente) {
             case INIZIO:
-                mess="BENVENUTO   COME TI CHIAMI ?";
+                messaggio = "Benvenuto! Come ti chiami?";
                 break;
-            case ORDINAPRODOTTO :
-                mess = nome + "SCEGLI COSA ORDINARE  : 1.PIZZA 2.BIBITA 3.PANINO ";
+            case ORDINAPRODOTTO:
+                messaggio = nomeCliente + " Scegli cosa ordinare: 1.Pizza 2.Bibita 3.Panino";
                 break;
-            case ELENCOPIZZE: 
-                mess = nome + " ELENCO PIZZE : 1.Margherita 2.Diavola 3.Patatosa 4.Viennese ";
+            case ELENCOPIZZE:
+                messaggio = nomeCliente + " Elenco Pizze: 1.Margherita 2.Patatosa 3.Viennese 4.Quattro formaggi 5.Diavola";
                 break;
-            case ORDINAPIZZE:
-                mess = nome + "ordina ancora pizza 2.ordina un altro prodotto";
+            case ELENCOBIBITE:
+                messaggio = nomeCliente + " Elenco bibite: 1.Coca-Cola 2.Fanta 3.The 4.Birra 5.Vino";
                 break;
-            case ELENCOBIBITE : 
-                mess = nome + "Elenco BIbite : 1.the 2.acqua 3.coca-cola 4.vino 5.fanta 6.birra";
+            case ELENCOPANINO:
+                messaggio = nomeCliente + " Elenco panini: 1.Bacon King 2.CrispyMcBacon 3.Toast";
                 break;
-            case ELENCOPANINI :
-                mess = nome + "Elenco Panini : 1.Bacon King 2.CrispyMcBecon 3.tost";
+            case ORDINAPIZZA:
+                messaggio = nomeCliente + " 1.Ordina ancora pizza 2.Ordina un altro prodotto 3.Termina e Paga";
                 break;
-            case ORDINABIBITE :
-                mess = nome + "ordina bibita : 1.ordina ancora bibita 2. ordina un altro prodotto";
+            case ORDINABIBITA:
+                messaggio = nomeCliente + " 1.Ordina ancora bibita 2.Ordina un altro prodotto 3.Termina e Paga";
                 break;
-            case ORDINAPANINI:
-                mess = nome + "ordina panino : 1.ordina altro panino 2.ordina altro prodotto ";
+            case ORDINAPANINO:
+                messaggio = nomeCliente + " 1.Ordina ancora panino 2.Ordina un altro prodotto 3.Termina e Paga";
                 break;
-            case TERMINA :
-                mess = nome + "arrivederci";
-                break; 
+            case TERMINA:
+                messaggio = nomeCliente + " Grazie e arrivederci! Digita \"exit\" per uscire";
+                break;
         }
-        return mess;
+        return messaggio;
     }
-    public void changeStato(String mess){
-        switch(statoCorrente){
+
+    public void cambiaStato(String msg) {
+        switch (statoCorrente) {
             case INIZIO:
-                nome = mess;
-                this.statoCorrente= ORDINAPRODOTTO;
+                nomeCliente = msg;
+                this.statoCorrente = ORDINAPRODOTTO;
                 break;
-            case ORDINAPRODOTTO :
-                switch (mess){
-                    case "1" : 
-                        this.statoCorrente=ELENCOPIZZE;
+            case ORDINAPRODOTTO:
+                switch (msg) {
+                    case "1"://Pizza
+                        this.statoCorrente = ELENCOPIZZE;
                         break;
-                    case "2" : 
-                        this.statoCorrente=ELENCOBIBITE;
+                    case "2"://Bibita
+                        this.statoCorrente = ELENCOBIBITE;
                         break;
-                    case "3" : 
-                        this.statoCorrente=ELENCOPANINI;
+                    case "3"://Panino
+                        this.statoCorrente = ELENCOPANINO;
                         break;
                 }
                 break;
-            case ELENCOPIZZE :
-                this.statoCorrente= ORDINAPIZZE;
+            case ELENCOPIZZE:
+                this.statoCorrente = ORDINAPIZZA;
                 break;
-            case TERMINA :
-                if(mess.toUpperCase().equals("exit")) clienteFinito = true;
+            case ELENCOBIBITE:
+                this.statoCorrente = ORDINABIBITA;
                 break;
-                
+            case ELENCOPANINO:
+                this.statoCorrente = ORDINAPANINO;
+                break;
+            case ORDINAPIZZA:
+                switch (msg) {
+                    case "1"://ordina altra pizza
+                        this.statoCorrente = ELENCOPIZZE;
+                        break;
+                    case "2"://ordina altro prodotto
+                        this.statoCorrente = ORDINAPRODOTTO;
+                        break;
+                    case "3"://termina
+                        this.statoCorrente = TERMINA;
+                        break;
+                }
+                break;
+            case ORDINABIBITA:
+                switch (msg) {
+                    case "1"://ordina altra pizza
+                        this.statoCorrente = ELENCOBIBITE;
+                        break;
+                    case "2"://ordina altro prodotto
+                        this.statoCorrente = ORDINAPRODOTTO;
+                        break;
+                    case "3"://termina
+                        this.statoCorrente = TERMINA;
+                        break;
+                }
+                break;
+            case ORDINAPANINO:
+                switch (msg) {
+                    case "1"://ordina altra pizza
+                        this.statoCorrente = ELENCOPANINO;
+                        break;
+                    case "2"://ordina altro prodotto
+                        this.statoCorrente = ORDINAPRODOTTO;
+                        break;
+                    case "3"://termina
+                        this.statoCorrente = TERMINA;
+                        break;
+                }
+                break;
+            case TERMINA:
+                if(msg.toUpperCase().equals("EXIT")) hasClienteFinito = true;
+                break;
         }
     }
-    
+
 }

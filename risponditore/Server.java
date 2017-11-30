@@ -58,16 +58,16 @@ class ServerTask extends Thread {
             in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
             String mess;
-            out.write(pizzeria.messaggio());
+            out.write(pizzeria.getMessaggio());
             out.write("\n");
             out.flush();
             do {
                 mess = in.readLine();
-                pizzeria.changeStato(mess);
-                out.write(pizzeria.messaggio());
+                pizzeria.cambiaStato(mess);
+                out.write(pizzeria.getMessaggio());
                 out.write("\n");
                 out.flush();
-            } while (!pizzeria.clienteFinito());
+            } while (!pizzeria.hasClienteFinito());
 
         } catch (IOException ex) {
             Logger.getLogger(ServerTask.class.getName()).log(Level.SEVERE, null, ex);
