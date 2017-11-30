@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">YourChat</string>
 
+    <string name="change_picture">Cambia immagine profilo</string>
+    <string name="select_picture">Seleziona la tua immagine profilo</string>
     <string name="prompt_user">Nome utente</string>
     <string name="name">Nome</string>
     <string name="action_delete">Elimina account</string>
     <string name="surname">Cognome</string>
-    <string name="delete_message">Ci dispiace che te ne voglia andare </string>
+    <string name="delete_account">Ci dispiace che te ne voglia andare </string>
     <string name="button_delete">Elimina account</string>
     <string name="prompt_password">Password</string>
     <string name="action_log_in">ACCEDI</string>
@@ -26,4 +28,14 @@
     <string name="headUserList">Utenti registrati:</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="retry_connection">Riprova connessione</string>
+    <string name="unknow_error">Errore sconosciuto</string>
+    <string name="home_page">Home Page</string>
+    <string name="home_page_display">Bentornato! \n Goditi le tua chat</string>
+    <string name="error_connection"> Oh no, sembra che il server sia disconnesso :/</string>
+    <string name="no_chat">Nessuna conversazione momentaneamente</string>
+    <string name="invalid_input">Inserisci almeno 1 carattere \n al massimo 500 caratteri</string>
+    <string name="changing_image_error">Non è stato possibile cambiare l\'immagine</string>
+    <string name="succ_image_change">Immagine cambiata con successo</string>
+    <string name="account_deleted">Account eliminato con successo</string>
 </resources>

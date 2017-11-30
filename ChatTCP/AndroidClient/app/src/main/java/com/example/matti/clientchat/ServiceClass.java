@@ -1,172 +1,176 @@
 package com.example.matti.clientchat;
 
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.support.annotation.Nullable;
-import android.widget.Toast;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import oggetti.Messaggio;
 
 /**
  * @author Musone Mattia
  */
-class ServiceClass extends Thread {
+class ServiceClass extends Observable implements Serializable {
 
-    static Socket socket;
-    static ObjectOutputStream out;
-    static ObjectInputStream in;
-    String serverAddress = "192.168.1.11";
+    private static Socket socket;
+    private static ObjectOutputStream out;
+    private static ObjectInputStream in;
+    private String serverAddress = "192.168.1.10";
+    protected Messaggio msg;
+    private boolean run;
+    private Receiver t1;
 
-    @Override
-    public synchronized void run() {
-        try {
-            socket = new Socket(serverAddress, 9090);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-        } catch (Exception e) {
-            e.printStackTrace();
+    void tryConnection() {
+        if (socket == null || !socket.isConnected()) {
+            try {
+                new Connection().execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        if (socket != null && socket.isConnected()) {
+            run = true;
+            t1 = new Receiver();
+            t1.start();
         }
     }
 
-
-
-    synchronized String[] isRegistered(String nomeUtente) {
-        Message1 m = new Message1();
-        m.execute("0", "", nomeUtente);
-        try {
-            return (String[]) m.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-            String[] ris = {"Sei disconnesso dal server", "1"};
-            return ris;
-        }
+    void registerToDB(String nome, String cognome, String nomeUtente, String password) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.REGISTRAZIONE, null, nomeUtente, null, nome, cognome, password));
     }
 
-    synchronized String[] registerToDB(String nome, String cognome, String nomeUtente, String password) {
-        String invio = nome + "," + cognome + "," + nomeUtente + "," + password;
-        Message1 m = new Message1();
-        m.execute("1", "", invio);
-        try {
-            return (String[]) m.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-            String[] ris = {"Sei disconnesso dal server", "1"};
-            return ris;
-        }
-
+    void accedi(String nomeUtente, String password) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.ACCESSO, null, nomeUtente, null, null, null, password));
     }
 
-    synchronized String[] accedi(String nomeUtente, String password) {
-        String invio = nomeUtente + "," + password;
-        Message1 m = new Message1();
-        m.execute("3", "", invio);
-        try {
-            return (String[]) m.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-            String[] ris = {"Sei disconnesso dal server", "1"};
-            return ris;
-        }
+    void invioChat(String chat, String sorg, String dest) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.SALVACONVERSAZIONE, chat, sorg, dest, null, null, null));
     }
 
-
-    synchronized ArrayList<String[]> showChat(String utenteDest, String utenteSorg) {
-        String invio = utenteDest + "," + utenteSorg;
-        try {
-            Message1 m = new Message1();
-            m.execute("4", "", invio);
-
-            return (ArrayList<String[]>) m.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-            ArrayList<String[]> error = new ArrayList<>();
-            String temp[] = {"Disconnesso"};
-            error.add(temp);
-            return error;
-        }
+    void showChat(String nomeUtetne, String utenteDest) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.MOSTRAMESSAGGIO, null, nomeUtetne, utenteDest, null, null, null));
     }
 
-    synchronized ArrayList<String> getUtenti(String utente) {
-        Message1 m = new Message1();
-        m.execute("5", "", utente);
-        try {
-            return (ArrayList<String>) m.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException  | ClassCastException | TimeoutException e) {
-            e.printStackTrace();
-            ArrayList<String> temp = new ArrayList<>();
-            temp.add("Errore di comunicazione");
-            return temp;
-        }
-
+    void getUtenti(String utente) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.OTTIENIUTENTI, null, utente, null, null, null, null));
     }
 
-    synchronized protected String invioChat(String chat, String utenteSorg, String utenteDest, String idUtente) {
-        String invio = utenteSorg + "," + utenteDest + "," + idUtente;
-        Message1 m = new Message1();
-        m.execute("6", chat, invio);
-        try {
-
-            return String.valueOf(m.get(1000, TimeUnit.MILLISECONDS));
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-        }
-        return "Sei disconnesso dal server";
+    void deleteAccount(String password, String nomeUtente) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.CANCELLAZIONE, null, nomeUtente, null, null, null, password));
     }
 
-    synchronized protected String deleteAccount(String utente, String password) {
-        String invio = utente + "," + password;
-        Message1 m = new Message1();
-        m.execute("7", "", invio);
-        try {
-
-            return String.valueOf(m.get(1000, TimeUnit.MILLISECONDS));
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-        }
-        return "Sei disconnesso dal server";
+    void setImage(String nomeUtente, byte[] immagine) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.IMMAGINE, immagine, nomeUtente, null, null, null, null));
     }
 
-    class Message1 extends AsyncTask<String, String, Object> {
+    void closeConnection(String nomeUtente) {
+        Sender sender = new Sender();
+        sender.execute(new Messaggio(Messaggio.INTERROMPI, null, nomeUtente, null, null, null, null));
+        new CloseConnection().execute();
+    }
+
+    private void connectionError() {
+        msg = new Messaggio(Messaggio.ERRORECONNESSIONE, "Sei disconnesso dal server", null, null, null, null, null);
+        refresh();
+    }
+
+    private void refresh() {  //aggiorna le viste
+        setChanged();
+        notifyObservers();
+    }
+
+    private class CloseConnection extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected synchronized Object doInBackground(String... ints) {
-            int function = Integer.parseInt(ints[0]);
-            String chat = ints[1];
-            String invio = (String) ints[2];
-
+        protected Void doInBackground(Void... voids) {
             try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
 
-                out.writeInt(function);
-                out.writeUTF(invio);
-                if (!chat.isEmpty()) {
-                    out.writeUTF(chat);
-                }
+
+    private class Sender extends AsyncTask<Messaggio, Void, Void> {
+
+        @Override
+        protected synchronized Void doInBackground(Messaggio... ints) {
+            try {
+                out.reset();
+                out.writeObject(ints[0]);
                 out.flush();
-
-                return in.readObject();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException | NullPointerException e) {
+                connectionError();
                 return null;
+            }
+            return null;
+        }
+    }
+
+    private class Connection extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected synchronized Void doInBackground(Void... ints) {
+            try {
+                socket = new Socket();
+                socket.connect(new InetSocketAddress(serverAddress, 9191), 1000);
+                out = new ObjectOutputStream(socket.getOutputStream());
+                in = new ObjectInputStream(socket.getInputStream());
+            } catch (Exception e) {
+                connectionError();
+            }
+            return null;
+        }
+    }
+
+    private class Receiver extends Thread implements Serializable {
+        @Override
+        public synchronized void run() {
+            try {
+                msg = new Messaggio(Messaggio.CONNESSO, null, null, null, null, null, null);
+                refresh();
+                while (run && socket != null && socket.isConnected()) {
+                    msg = (Messaggio) in.readObject();
+                    if (msg.getFunzione() == Messaggio.ACCESSO) {
+                        if (!((Object[]) msg.getMessaggio())[0].equals("1")) {
+                            run = false;
+                        }
+                    }
+                    refresh();
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                socket = null;
+                connectionError();
             }
         }
     }
 
 }
+
 

@@ -6,11 +6,20 @@
 package clientchat;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import oggetti.Messaggio;
 
 /**
  *
@@ -22,13 +31,33 @@ public class Client extends JFrame implements Observer {
     private String utenteSel, nomeUtenteNow;
     private Service service;
 
-    public Client(String utenteAttuale) {
+    private StyledDocument stileChat;
+    private SimpleAttributeSet entrata;
+    private SimpleAttributeSet uscita;
+
+    public Client(Service ser, String nomeUtente, byte[] image) {
         initComponents();
         utenteSel = "";
+        if(image!=null){
+        immagine.setIcon(this.setImmagine(image));
+        }
         modello = (DefaultListModel<String>) listaUtenti.getModel();
-        this.setTitle(utenteAttuale);
-        nomeUtenteNow = utenteAttuale;
-        service = new Service();
+        nomeUtenteNow = nomeUtente;
+        this.setTitle(nomeUtenteNow);
+        displayNomeUtente.setText(nomeUtenteNow);
+        service = ser;
+        service.getUtenti(nomeUtenteNow);
+        stato.setText("Connsesso");
+
+        stileChat = chat.getStyledDocument();
+        entrata = new SimpleAttributeSet();
+        StyleConstants.setAlignment(entrata, StyleConstants.ALIGN_LEFT);
+        StyleConstants.setForeground(entrata, Color.GRAY);
+
+        uscita = new SimpleAttributeSet();
+        StyleConstants.setAlignment(uscita, StyleConstants.ALIGN_RIGHT);
+        StyleConstants.setForeground(uscita, Color.decode("#000080"));
+        chat.setText("");
     }
 
     /**
@@ -47,18 +76,19 @@ public class Client extends JFrame implements Observer {
         confermaBtn = new javax.swing.JButton();
         sugEl = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        displayNomeUtente = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listaUtenti = new javax.swing.JList<>();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        chat = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         inputChat = new javax.swing.JTextArea();
         invio = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         stato = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        eliminaAccount = new javax.swing.JButton();
         aggiornaChat = new javax.swing.JButton();
+        immagine = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        chat = new javax.swing.JTextPane();
 
         eliminaDialog.setAlwaysOnTop(true);
         eliminaDialog.setMinimumSize(new java.awt.Dimension(300, 300));
@@ -108,7 +138,7 @@ public class Client extends JFrame implements Observer {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setResizable(false);
+        setMaximumSize(new java.awt.Dimension(630, 445));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
@@ -118,6 +148,8 @@ public class Client extends JFrame implements Observer {
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel1.setText("Bentornato");
+
+        displayNomeUtente.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
 
         listaUtenti.setModel(new DefaultListModel<String>() {
 
@@ -135,11 +167,6 @@ public class Client extends JFrame implements Observer {
     });
     jScrollPane1.setViewportView(listaUtenti);
 
-    chat.setEditable(false);
-    chat.setColumns(20);
-    chat.setRows(5);
-    jScrollPane2.setViewportView(chat);
-
     inputChat.setColumns(20);
     inputChat.setRows(5);
     jScrollPane3.setViewportView(inputChat);
@@ -155,10 +182,10 @@ public class Client extends JFrame implements Observer {
 
     stato.setText("null");
 
-    jButton1.setText("Elimina account");
-    jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+    eliminaAccount.setText("Elimina account");
+    eliminaAccount.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseReleased(java.awt.event.MouseEvent evt) {
-            jButton1MouseReleased(evt);
+            eliminaAccountMouseReleased(evt);
         }
     });
 
@@ -169,37 +196,43 @@ public class Client extends JFrame implements Observer {
         }
     });
 
+    jScrollPane5.setViewportView(chat);
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGap(521, 521, 521)
+                    .addComponent(aggiornaChat))
                 .addGroup(layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
-                    .addGap(18, 18, 18)
+                    .addContainerGap()
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel3)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton1))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(aggiornaChat)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(stato, javax.swing.GroupLayout.PREFERRED_SIZE, 445, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                                .addComponent(immagine, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(invio)))))
-                    .addContainerGap(20, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jLabel3)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(stato, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addComponent(invio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel1)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(displayNomeUtente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(jScrollPane5)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addGap(0, 0, Short.MAX_VALUE)
+                                    .addComponent(eliminaAccount)))))))
+            .addContainerGap())
     );
     layout.setVerticalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,25 +242,25 @@ public class Client extends JFrame implements Observer {
                 .addGroup(layout.createSequentialGroup()
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel1)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGap(18, 18, 18))
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addComponent(jButton1)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addComponent(displayNomeUtente, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(eliminaAccount))
+                .addComponent(immagine, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(18, 18, 18)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addComponent(invio, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)))
-                .addComponent(jScrollPane1))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(invio, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(aggiornaChat)
                 .addComponent(jLabel3)
-                .addComponent(stato)
-                .addComponent(aggiornaChat))
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(stato))
+            .addContainerGap())
     );
 
     pack();
@@ -240,54 +273,34 @@ public class Client extends JFrame implements Observer {
     private void listaUtentiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaUtentiMouseClicked
         chat.setText("");
         utenteSel = listaUtenti.getSelectedValue();
-        ArrayList<String[]> chatT = service.showChat(utenteSel);
-        if (chatT.isEmpty() || chatT.get(0)[0].equals("0")) {
-            chat.setText("Nessuna conversazione momentaneamente");
-        } else if (chatT.get(0)[0].equals("Disconnesso")) {
-            stato.setText("Oh no, sembra che il server sia disconnesso :/");
-        } else {
-            for (int i = 0; i < chatT.size(); i++) {
-                String chatI[] = chatT.get(i);
-                chat.append(chatI[0] + "\n" + chatI[2] + "\n     " + chatI[1] + "\n");
-            }
-        }
+        updateChat();
+
     }//GEN-LAST:event_listaUtentiMouseClicked
 
     private void invioMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_invioMouseReleased
         if (inputChat.getText().length() > 0 && inputChat.getText().length() < 500) {
-            updateChat();
+            service.saveChat(inputChat.getText(),nomeUtenteNow, utenteSel);
         } else {
             inputChat.setText("Inserisci almeno 1 carattere e al massimo 500");
         }
     }//GEN-LAST:event_invioMouseReleased
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        service.closeConnection();
-        // System.out.println("Chiuso");
+        service.closeConnection(nomeUtenteNow);
     }//GEN-LAST:event_formWindowClosed
 
-    private void jButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseReleased
+    private void eliminaAccountMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_eliminaAccountMouseReleased
         eliminaDialog.setVisible(true);
         eliminaDialog.setAlwaysOnTop(true);
         messaggio.setText(messaggio.getText().toString() + nomeUtenteNow);
         nomeUtenteEl.setEnabled(false);
         nomeUtenteEl.setText(nomeUtenteNow);
-    }//GEN-LAST:event_jButton1MouseReleased
+    }//GEN-LAST:event_eliminaAccountMouseReleased
 
     private void confermaBtnMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_confermaBtnMouseReleased
         sugEl.setText("");
         if (passwordEl.getText().toString().length() > 0) {
-            String check = service.deleteAccount(passwordEl.getText().toString());
-            if (check.contains("disconnesso")) {
-                sugEl.setText("Sei disconnesso dal server");
-            } else if (check.equals("false")) {
-                sugEl.setText("Password errata");
-            } else {
-                eliminaDialog.dispose();
-                dispose();
-                Accesso a = new Accesso();
-                a.setVisible(true);
-            }
+            service.deleteAccount(passwordEl.getText(), nomeUtenteNow);
         } else {
             sugEl.setForeground(Color.red);
             sugEl.setText("Inserisci la password");
@@ -301,18 +314,19 @@ public class Client extends JFrame implements Observer {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton aggiornaChat;
-    private javax.swing.JTextArea chat;
+    private javax.swing.JTextPane chat;
     private javax.swing.JButton confermaBtn;
+    private javax.swing.JLabel displayNomeUtente;
+    private javax.swing.JButton eliminaAccount;
     private javax.swing.JDialog eliminaDialog;
+    private javax.swing.JLabel immagine;
     private javax.swing.JTextArea inputChat;
     private javax.swing.JButton invio;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JList<String> listaUtenti;
     private javax.swing.JLabel messaggio;
     private javax.swing.JLabel nomeUtenteEl;
@@ -322,34 +336,91 @@ public class Client extends JFrame implements Observer {
     // End of variables declaration//GEN-END:variables
 
     private void updateChat() {
-        String data = service.saveChat(inputChat.getText().toString(), utenteSel);
-        if (data.equals("true")) {
-            chat.setText("");
-            chat.append("Tu: " + inputChat.getText() + "\n");
-            inputChat.setText("");
-        } else if (data.contains("disconnesso")) {
-            stato.setText("Disconnesso, il messaggio non è stato inviato");
-        } else {
-            stato.setText("Errore sconosciuto, il messaggio non è stato inviato");
-        }
+        service.showChat(nomeUtenteNow, utenteSel);
     }
 
     @Override
     public void update(Observable o, Object arg) {
         Service my = (Service) (o);
-        //System.out.println(my.connectionState());
-        if (!my.connectionState()) {
-            stato.setText("Disconnesso");
-            invio.setEnabled(false);
-            inputChat.setEnabled(false);
-        } else {
-            stato.setText("Connesso");
-            invio.setEnabled(true);
-            inputChat.setEnabled(true);
-            ArrayList<String> utenti = my.getUtenti(this.getTitle());
-            for (int i = 0; i < utenti.size(); i++) {
-                modello.addElement(utenti.get(i));
-            }
+        Messaggio msg = my.msg;
+        switch (msg.getFunzione()) {
+            case Messaggio.ERRORECONNESSIONE:
+                stato.setText("Disconnesso");
+                eliminaAccount.setEnabled(false);
+                invio.setEnabled(false);
+                inputChat.setEnabled(false);
+                aggiornaChat.setEnabled(false);
+                break;
+            case Messaggio.CANCELLAZIONE:
+                String check = String.valueOf(msg.getMessaggio());
+                if (check.equals("false")) {
+                    sugEl.setText("Password errata");
+                } else {
+                    eliminaDialog.dispose();
+                    dispose();
+                    service.doAccesso();
+                }
+                break;
+            case Messaggio.MOSTRAMESSAGGIO:
+                chat.setText("");
+                ArrayList<String[]> chatT = (ArrayList<String[]>) msg.getMessaggio();
+                if (chatT.isEmpty() || chatT.get(0)[0].equals("0")) {
+                    chat.setText("Nessuna conversazione momentaneamente");
+                } else if (chatT.get(0)[0].equals("Disconnesso")) {
+                    stato.setText("Oh no, sembra che il server sia disconnesso :/");
+                } else {
+                    for (int i = 0; i < chatT.size(); i++) {
+                        String chatI[] = chatT.get(i);
+                        try {
+                            if (!chatI[0].equals(msg.getNomeUtenteDest()+": ")) {
+                                stileChat.setParagraphAttributes(stileChat.getLength(), 1, uscita, false);
+                                stileChat.insertString(stileChat.getLength(), chatI[2] + "\n" + chatI[1] + "\n", uscita);
+                            } else {
+                                stileChat.setParagraphAttributes(stileChat.getLength(), 1, entrata, false);
+                                stileChat.insertString(stileChat.getLength(),chatI[2] + "\n" + chatI[1] + "\n", entrata);
+                            }
+                        } catch (BadLocationException ex) {
+                            //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                break;
+            case Messaggio.OTTIENIUTENTI:
+                ArrayList<String> utenti = (ArrayList<String>) msg.getMessaggio();
+                for (int i = 0; i < utenti.size(); i++) {
+                    modello.addElement(utenti.get(i));
+                }
+                break;
+            case Messaggio.SALVACONVERSAZIONE:
+                String data = String.valueOf(msg.getMessaggio());
+                if (data.equals("true")) {
+                    try {
+                        stileChat.setParagraphAttributes(stileChat.getLength(), 1, uscita, false);
+                        stileChat.insertString(stileChat.getLength(), "Tu: " + inputChat.getText() + "\n", uscita);
+                        inputChat.setText("");
+                    } catch (BadLocationException ex) {
+                        Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else if (data.contains("disconnesso")) {
+                    stato.setText("Disconnesso, il messaggio non è stato inviato");
+                } else {
+                    stato.setText("Errore sconosciuto, il messaggio non è stato inviato");
+                }
+                break;
+            case Messaggio.CONNESSO:
+                stato.setText("Connesso");
+                break;
+            default:
+                System.out.println("Errore sconosciuto");
+                break;
         }
+    }
+
+    private ImageIcon setImmagine(byte[] percorso) {
+        ImageIcon myImage = new ImageIcon(percorso);
+        Image img = myImage.getImage();
+        Image newImg = img.getScaledInstance(immagine.getWidth(), immagine.getHeight(), Image.SCALE_SMOOTH);
+        ImageIcon image = new ImageIcon(newImg);
+        return image;
     }
 }

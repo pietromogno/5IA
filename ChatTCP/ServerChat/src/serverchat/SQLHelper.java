@@ -21,9 +21,10 @@ import java.util.Calendar;
 public class SQLHelper {
 
     Connection conn;
-/**
- * Avviene la connessione col database
- */
+
+    /**
+     * Avviene la connessione col database con design pattern Singleton
+     */
     SQLHelper() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -32,44 +33,17 @@ public class SQLHelper {
             e.printStackTrace();
         }
     }
-/**
- * Funzione che controlla se un utente è registrato o meno
- * @param nomeUtente nome da controllare se è registrato
- * @return una stringa contenente gli errori o il risutato 
- */
-    String[] isRegistered(String nomeUtente) throws SQLException {
-        try {
-            ResultSet rs;
-            PreparedStatement tabella = conn.prepareStatement("SELECT UTENTI.nomeUtente "
-                    + "FROM UTENTI "
-                    + "WHERE UTENTI.nomeUtente LIKE ?");
-            tabella.setString(1, nomeUtente);
-            rs = tabella.executeQuery();
-            if (rs.next()) {
-                //System.out.println("ok");
-                String[] ris = {"", ""};//se c'è una tabella nei risultati significa che è stato trovato un utente con tale nome
-                return ris;
-            }
-        } catch (SQLException ex) {
-            //ex.printStackTrace();
-            //System.out.println("Errore");
-            String[] ris = {"Non sei registrato", "1"};//altrimenti non esiste nessun utente con quel nome
 
-            return ris;
-        }
-        //System.out.println("out");
-        String[] ris = {"Non sei registrato", "1"};
-
-        return ris;
-    }
-/**
- * Funzione che si occupa della registrazione di ogni utente nel DB e alla creazione dell tabella chat
- * @param nome nome dell'utente
- * @param cognome cognome dell'utente
- * @param nomeUtente nome univoco dell'utente
- * @param password password dell'utente
- * @return una array di stringhe contenente gli errori o il risutato 
- */
+    /**
+     * Funzione che si occupa della registrazione di ogni utente nel DB e alla
+     * creazione dell tabella chat
+     *
+     * @param nome nome dell'utente
+     * @param cognome cognome dell'utente
+     * @param nomeUtente nome univoco dell'utente
+     * @param password password dell'utente
+     * @return una array di stringhe contenente gli errori o il risutato
+     */
     String[] resisterToDB(String nome, String cognome, String nomeUtente, String password) throws SQLException {
         try {
             PreparedStatement tabella = conn.prepareStatement("CREATE TABLE IF NOT EXISTS UTENTI "//creo la tabella se non esiste(primo utente registrato)
@@ -77,6 +51,7 @@ public class SQLHelper {
                     + "cognomeNome VARCHAR(50),"
                     + "nomeUtente VARCHAR(50),"
                     + "password VARCHAR(50),"
+                    + "immagineProfilo BLOB,"
                     + "UNIQUE(nomeUtente));");
             tabella.execute();
             PreparedStatement nuovoUtente = conn.prepareStatement(//inserisco l'utente nella tabella
@@ -88,67 +63,76 @@ public class SQLHelper {
             nuovoUtente.setString(3, password);
             nuovoUtente.executeUpdate();
             PreparedStatement tabellaUtente = conn.prepareStatement("CREATE TABLE IF NOT EXISTS CHAT "//creo una tabella contenente lo storico di tutte le chat
-                    + "(utenteDestinatario VARCHAR(50), "
-                    + "utenteSorgente VARCHAR(50), "
+                    + "(utenteDestinatario INTEGER, "
+                    + "utenteSorgente INTEGER, "
                     + "chat VARCHAR(500), "
-                    + "dataOra VARCHAR(20));");
+                    + "dataOra VARCHAR(20), "
+                    + "FOREIGN KEY (utenteDestinatario) REFERENCES UTENTI(nomeUtente), "
+                    + "FOREIGN KEY (utenteSorgente) REFERENCES UTENTI(nomeUtente));");
             tabellaUtente.execute();
         } catch (SQLException ex) {
-            //Logger.getLogger(SQLHelper.class.getName()).log(Level.SEVERE, null, ex);
-            String[] temp = {"Nome utente già registrato", "1"};
+            //ex.printStackTrace();
+            String[] temp = {"1","Nome utente già registrato"};
             return temp;
         }
         String[] temp = {"", ""};
         return temp;
     }
-/**
- * Funzione che esegue l'accesso di un utente
- * @param nomeUtente
- * @param password
- * @return id dell'utente che ha effettuato l'accesso e il suo nomeUtente
- */
-    String[] accedi(String nomeUtente, String password) throws SQLException {
+
+    /**
+     * Funzione che esegue l'accesso di un utente
+     *
+     * @param nomeUtente
+     * @param password
+     * @return nomeUtente dell'utente che ha effettuato l'accesso e il suo nomeUtente
+     */
+    Object[] accedi(String nomeUtente, String password) throws SQLException {
         ResultSet rs;
         try {
-            PreparedStatement login = conn.prepareStatement("SELECT UTENTI.idUtente,UTENTI.nomeUtente, UTENTI.password "
+            PreparedStatement login = conn.prepareStatement("SELECT UTENTI.nomeUtente, UTENTI.password, UTENTI.immagineProfilo "
                     + "FROM UTENTI "
                     + "WHERE UTENTI.nomeUtente LIKE ? "
-                    + "AND UTENTI.password LIKE ?");
+                    + "AND UTENTI.password LIKE ? ");
             login.setString(1, nomeUtente.toUpperCase());
             login.setString(2, password);
             rs = login.executeQuery();
             if (rs.next()) {
-                String[] ris = {rs.getString("idUtente"), rs.getString("nomeUtente")};
+                Object[] ris = {rs.getString("nomeUtente"),rs.getBytes("immagineProfilo")};
                 return ris;
             }
-            //System.out.println("Sbagliato");
-            String[] ris = {"Il nome utente o la password non sono corretti", "1"};//se il risultato non contiene tabelle, significa che l'utente o la password non sono uguali a quelle nel DB
+            String[] ris = {"1","Il nome utente o la password non sono corretti"};//se il risultato non contiene tabelle, significa che l'utente o la password non sono uguali a quelle nel DB
             return ris;
         } catch (SQLException e) {
-            //e.printStackTrace();
-            //System.out.println("errore");
-            String[] ris = {"Non sei registrato", "1"};//eccezzione perchè le credenziali immesse non esistono
+            String[] ris = {"1","Non sei registrato"};//eccezzione perchè le credenziali immesse non esistono
             return ris;
         }
     }
-/**
- * Funzione che ha il compito di suddividere le chat per ogni utente
- * @param utenteDest utente a cui ho scritto
- * @param nomeUtente utente che ha scritto
- * @return Arraylist di array di stringhe dove ogni array di stringhe è un messsaggio
- */
+
+    /**
+     * Funzione che ha il compito di suddividere le chat per ogni utente
+     *
+     * @param utenteDest utente a cui ho scritto
+     * @param nomeUtente utente che ha scritto
+     * @return Arraylist di array di stringhe dove ogni array di stringhe è un
+     * messsaggio
+     */
     ArrayList<String[]> showChat(String utenteDest, String nomeUtente) throws SQLException {
         ArrayList<String[]> ris = new ArrayList<>();
         try {
+            System.out.println(nomeUtente+"  show   "+utenteDest);
             PreparedStatement chat = conn.prepareStatement(
-                    "SELECT CHAT.utenteDestinatario,CHAT.chat,CHAT.dataOra "
+                    "SELECT * "
                     + "FROM CHAT "
-                    + "WHERE CHAT.utenteDestinatario = '" + utenteDest + "' AND CHAT.utenteSorgente = '" + nomeUtente + "' "
+                    + "WHERE CHAT.utenteSorgente = ? AND CHAT.utenteDestinatario = ? "
                     + "UNION ALL "
-                    + "SELECT CHAT.utenteDestinatario,CHAT.chat,CHAT.dataOra "
+                    + "SELECT * "
                     + "FROM CHAT "
-                    + "WHERE CHAT.utenteDestinatario = '" + nomeUtente + "' AND CHAT.utenteSorgente = '" + utenteDest + "' "
+                    + "WHERE CHAT.utenteSorgente = ? AND CHAT.utenteDestinatario = ? "
                     + "ORDER BY dataOra;");
+            chat.setString(1, nomeUtente);
+            chat.setString(2, utenteDest);
+            chat.setString(3, utenteDest);
+            chat.setString(4, nomeUtente);
             ResultSet rs = chat.executeQuery();
             while (rs.next()) {
                 String utenteTemp = rs.getString("utenteDestinatario");
@@ -161,18 +145,20 @@ public class SQLHelper {
                 ris.add(chatStr);
             }
         } catch (SQLException e) {
-            //e.printStackTrace();
-            String error[] = {"Errore, contatta l'amministratore", "1"};
+            e.printStackTrace();
+            String error[] = {"1","Errore, contatta l'amministratore"};
             ris.add(error);
             return ris;
         }
         return ris;
     }
-/**
- * Funzione che fornisce tutti gli utenti registrati
- * @param utente serve per evitare di mettere mè stesso tra i risultati
- * @return Arraylist di utenti
- */
+
+    /**
+     * Funzione che fornisce tutti gli utenti registrati
+     *
+     * @param utente serve per evitare di mettere mè stesso tra i risultati
+     * @return Arraylist di utenti
+     */
     ArrayList<String> getUtenti(String utente) throws SQLException {
         ArrayList<String> ris = new ArrayList<>();
         try {
@@ -185,21 +171,24 @@ public class SQLHelper {
                 ris.add(rs.getString("nomeUtente"));
             }
         } catch (SQLException e) {
-            //e.printStackTrace();         
+            e.printStackTrace();         
             ris.add("Errore, contatta l'amministratore");
         }
         return ris;
     }
-/**
- * Funzione che salva le chat sul DB
- * @param chat chat inviata
- * @param utenteSorg chi l'ha inviata
- * @param utenteDest chi la riceve
- * @param idUtente identificativo dell'utente mittente
- * @return true se è avvenuta l'operazione con successo, false c'è stato un errore
- */
-    boolean saveChat(String chat, String utenteSorg, String utenteDest, String idUtente) throws SQLException {
-        System.out.println(chat + "   " + utenteSorg + "   " + utenteDest + "   " + idUtente);
+
+    /**
+     * Funzione che salva le chat sul DB
+     *
+     * @param chat chat inviata
+     * @param utenteSorg chi l'ha inviata
+     * @param utenteDest chi la riceve
+     * @param idUtente identificativo dell'utente mittente
+     * @return true se è avvenuta l'operazione con successo, false c'è stato un
+     * errore
+     */
+    boolean saveChat(String chat, String utenteSorg, String utenteDest) throws SQLException {
+        System.out.println(chat + "   " + utenteSorg + "   " + utenteDest);
         String time = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss").format(Calendar.getInstance().getTime());
         try {
             PreparedStatement insertChat = conn.prepareStatement(
@@ -217,15 +206,18 @@ public class SQLHelper {
         }
         return true;
     }
-/**
- *  Funzione che cancella l'utente dal DB e le sue chat
- * @param nomeUtente
- * @param password
- * @return true se è avvenuta l'operazione con successo, false c'è stato un errore
- */
+
+    /**
+     * Funzione che cancella l'utente dal DB e le sue chat
+     *
+     * @param nomeUtente
+     * @param password
+     * @return true se è avvenuta l'operazione con successo, false c'è stato un
+     * errore
+     */
     boolean deleteAccount(String nomeUtente, String password) throws SQLException {
-        String ris[] = accedi(nomeUtente, password);
-        if (ris[1].equals(nomeUtente)) {
+        Object ris[] = accedi(nomeUtente, password);
+        if (ris[0].equals(nomeUtente)) {
             try {
                 PreparedStatement delete = conn.prepareStatement(
                         "DELETE "
@@ -244,5 +236,21 @@ public class SQLHelper {
             }
         }
         return false;
+    }
+
+    boolean insertImage(String nomeUtente, byte[] image) throws SQLException {
+        try {
+            PreparedStatement inImage = conn.prepareStatement(
+                    "UPDATE UTENTI "
+                    + "SET immagineProfilo = ? "
+                    + "WHERE UTENTI.nomeUtente = ? ;");
+            inImage.setBytes(1, image);
+            inImage.setString(2, nomeUtente);
+            inImage.execute();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();             
+            return false;
+        }
     }
 }

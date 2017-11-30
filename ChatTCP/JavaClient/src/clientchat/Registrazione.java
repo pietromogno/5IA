@@ -7,12 +7,17 @@ package clientchat;
 
 import java.awt.Color;
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JFrame;
+import oggetti.Messaggio;
 
 /**
  *
  * @author MATTI
  */
-public class Registrazione extends javax.swing.JFrame {
+public class Registrazione extends JFrame implements Observer {
 
     /**
      * Creates new form RegistrazioneAccesso
@@ -20,11 +25,10 @@ public class Registrazione extends javax.swing.JFrame {
     private Connection conn;
     private Service service;
 
-    public Registrazione() {
+    public Registrazione(Service ser) {
         initComponents();
-        service = new Service();
+        service = ser;
         suggerimento.setForeground(Color.red);
-
     }
 
     /**
@@ -206,20 +210,19 @@ public class Registrazione extends javax.swing.JFrame {
 
     private void registratiMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registratiMouseReleased
         String sNome, sCognome, sNomeUtente, sPassword;
-        if (control()) {
-            sNome = nome.getText();
-            sCognome = cognome.getText();
-            sNomeUtente = nomeUtente.getText();
-            sPassword = password.getText();
-            String[] error = service.registerToDB(sNome, sCognome, sNomeUtente, sPassword);
-            if (error[1].equals("1")) {
-                suggerimento.setText(error[0]);
+        if (!suggerimento.getText().equals("Sei disconnesso dal server")) {
+            if (control()) {
+                sNome = nome.getText();
+                sCognome = cognome.getText();
+                sNomeUtente = nomeUtente.getText();
+                sPassword = password.getText();
+                service.registerToDB(sNome, sCognome, sNomeUtente, sPassword);
+
             } else {
-                registrato();
+                suggerimento.setText((suggerimento.getText().length() > 0) ? suggerimento.getText() : "Errore sconosciuto");
             }
         } else {
-            System.out.println("no");
-            suggerimento.setText((suggerimento.getText().length() > 0) ? suggerimento.getText() : "Errore sconosciuto");
+            service.setConnection();
         }
     }//GEN-LAST:event_registratiMouseReleased
 
@@ -241,8 +244,7 @@ public class Registrazione extends javax.swing.JFrame {
     }//GEN-LAST:event_utenteRegistratoMouseReleased
 
     void registrato() {
-        Accesso a = new Accesso();
-        a.setVisible(true);
+        service.doAccesso();
         dispose();
     }
 
@@ -254,7 +256,6 @@ public class Registrazione extends javax.swing.JFrame {
                 && passwordConferma.getText().length() > 0
                 && password.getText().equals(passwordConferma.getText())) {
             if (nomeUtente.getText().matches("[a-zA-Z0-9]{4,}$")) {
-                System.out.println("è corretto");
                 return true;
             } else {
                 suggerimento.setText("Il nome utente può contenere solo lettere e numeri e deve essere lungo almeno 4 caratteri");
@@ -286,46 +287,6 @@ public class Registrazione extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Registrazione.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Registrazione.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Registrazione.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Registrazione.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Registrazione().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField cognome;
@@ -344,4 +305,46 @@ public class Registrazione extends javax.swing.JFrame {
     private javax.swing.JLabel suggerimento;
     private javax.swing.JLabel utenteRegistrato;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Service my = (Service) (o);
+        Messaggio msg = my.msg;
+        switch (msg.getFunzione()) {
+            case Messaggio.REGISTRAZIONE:
+                String registered[] = (String[]) msg.getMessaggio();
+                if (registered[0].equals("1")) {
+                    suggerimento.setText(registered[1]);
+                } else {
+                    service.doAccesso();
+                    dispose();
+                }
+                break;
+            case Messaggio.ERRORECONNESSIONE:
+                suggerimento.setText((String) msg.getMessaggio());
+                registrati.setText("Riprova connessione");
+                nomeUtente.setEnabled(false);
+                password.setEnabled(false);
+                configureButtons(false);
+                break;
+            case Messaggio.CONNESSO:
+                suggerimento.setText((String) msg.getMessaggio());
+                registrati.setText("Registrati");
+                nomeUtente.setEnabled(true);
+                password.setEnabled(true);
+                configureButtons(true);
+                break;
+            default:
+                suggerimento.setText("Errore sconosciuto");
+                break;
+        }
+    }
+
+    void configureButtons(boolean set) {
+        nome.setEnabled(set);
+        cognome.setEnabled(set);
+        nomeUtente.setEnabled(set);
+        password.setEnabled(set);
+        passwordConferma.setEnabled(set);
+    }
 }

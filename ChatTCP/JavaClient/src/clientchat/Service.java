@@ -8,11 +8,12 @@ package clientchat;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import oggetti.Messaggio;
 
 /**
  *
@@ -24,172 +25,151 @@ class Service extends Observable {
     private static ObjectOutputStream out;
     private static ObjectInputStream in;
     private static Client c;
-    private static String idUtente, nomeUtente;
-    private String serverAddress = "192.168.1.11";
+    private static Accesso a;
+    private static Registrazione r;
+    private String serverAddress = "localhost";
+    protected Messaggio msg;
 
     public static void main(String args[]) {
-        idUtente = args[0];
-        nomeUtente = args[1];
-        c = new Client(nomeUtente);
-        c.setVisible(true);
         new Service();
     }
 
     Service() {
+        doAccesso();
+    }
+
+    void startChatting(String nomeUtente, byte[] image) {
+        c = new Client(this, nomeUtente, image);
+        c.setVisible(true);
         try {
+            this.deleteObservers();
             this.addObserver(c);
+            if (socket == null || !socket.isConnected()) {
+                connectionError();
+            }
         } catch (NullPointerException ex) {
 
         }
+    }
+
+    void doRegistrazione() {
+        r = new Registrazione(this);
+        r.setVisible(true);
         try {
-            socket = new Socket(serverAddress, 9090);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-            refresh();
-        } catch (IOException e) {
-            refresh();
-            //System.out.println("Errore");
+            this.deleteObservers();
+            this.addObserver(r);
+            if (socket == null || !socket.isConnected()) {
+                connectionError();
+            }
+        } catch (NullPointerException ex) {
+
         }
     }
 
-    public static void closeConnection() {
+    void doAccesso() {
+        a = new Accesso(this);
+        a.setVisible(true);
+        try {
+            this.deleteObservers();
+            this.addObserver(a);
+            if (socket == null || !socket.isConnected()) {
+                connectionError();;
+            }
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    void setConnection() {
+        try {
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(serverAddress, 9191), 2000);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+            msg = new Messaggio(Messaggio.CONNESSO, null, null, null, null, null, null);
+            new Thread(new Reader()).start();
+            refresh();
+
+        } catch (IOException e) {
+            connectionError();
+        }
+    }
+
+    class Reader extends Thread {
+
+        @Override
+        public synchronized void run() {
+            try {
+                while (socket != null && !socket.isClosed()) {
+                    msg = (Messaggio) in.readObject();
+                    refresh();
+                }
+            } catch (IOException | ClassNotFoundException ex) {
+                Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);
+                connectionError();
+            }
+        }
+    }
+
+    public void closeConnection(String nomeUtente) {
         if (connectionState()) {
             try {
-                socket.close();
+                writeToServer(new Messaggio(Messaggio.INTERROMPI, null, nomeUtente, null, null, null, null));
                 in.close();
                 out.close();
-            } catch (Exception e) {
-                //System.out.println("Errore chiusura");
+                socket.close();
+            } catch (IOException e) {
             }
         }
     }
     
-     void reconnect(){
-        try {
-            socket = new Socket(serverAddress, 9090);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            refresh();
-        }
+    void registerToDB(String nome, String cognome, String nomeUtente, String password) {
+        writeToServer(new Messaggio(Messaggio.REGISTRAZIONE, null, nomeUtente, null, nome, cognome, password));
     }
 
-     String[] isRegistered(String nomeUtente) {
-        try {
-            out.writeInt(0);
-            out.writeUTF(nomeUtente);
-            out.flush();
-            return (String[]) in.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            //Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);ù
-            reconnect();
-            String[] ris = {"Sei disconnesso dal server", "1"};
-            return ris;
-        }
+    void accedi(String nomeUtente, String password) {
+        writeToServer(new Messaggio(Messaggio.ACCESSO, null, nomeUtente, null, null, null, password));
     }
 
-    String[] registerToDB(String nome, String cognome, String nomeUtente, String password) {
-        String invio = nome + "," + cognome + "," + nomeUtente + "," + password;
-        try {
-            out.writeInt(1);
-            out.writeUTF(invio);
-            out.flush();
-            return (String[]) in.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            // Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);
-            reconnect();
-            String[] ris = {"Sei disconnesso dal server", "1"};
-            return ris;
-        }
+    protected void saveChat(String chat, String sorg, String dest) {
+        writeToServer(new Messaggio(Messaggio.SALVACONVERSAZIONE, chat, sorg, dest, null, null, null));
     }
 
-     String[] accedi(String nomeUtente, String password) {
-        String invio = nomeUtente + "," + password;
-        try {
-            out.writeInt(3);
-            out.writeUTF(invio);
-            out.flush();
-            return (String[]) in.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            //Logger.getLogger(Service.class.getName()).log(Level.SEVERE, null, ex);
-            reconnect();
-            String[] ris = {"Sei disconnesso dal server", "1"};
-            return ris;
-        }
+    void showChat(String nomeUtetne, String utenteDest) {
+        writeToServer(new Messaggio(Messaggio.MOSTRAMESSAGGIO, null, nomeUtetne, utenteDest, null, null, null));
     }
 
-     protected String saveChat(String chat, String dest) {
-        String invio = nomeUtente + "," + dest + "," + idUtente;
-        try {
-            out.writeInt(6);
-            out.writeUTF(invio);
-            out.writeUTF(chat);
-            out.flush();
-            return String.valueOf(in.readObject());
-        } catch (IOException | ClassNotFoundException e) {
-            //e.printStackTrace();
-            //System.out.println("Errore ricezione");
-            reconnect();
-            return "Sei disconnesso dal server";
-        }
-        
+    void getUtenti(String utente) {
+        writeToServer(new Messaggio(Messaggio.OTTIENIUTENTI, null, utente, null, null, null, null));
     }
 
-     ArrayList<String[]> showChat(String utenteDest) {
-        String invio = utenteDest + "," + nomeUtente;
-        Object c = null;
-        try {
-            out.writeInt(4);
-            out.writeUTF(invio);
-            out.flush();
-            return (ArrayList<String[]>) in.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            //ex.printStackTrace();
-            reconnect();
-            ArrayList<String[]> error = new ArrayList<>();
-            String temp[] = {"Disconnesso"};
-            error.add(temp);
-            return error;
-        }
-
+    void deleteAccount(String password, String nomeUtente) {
+        writeToServer(new Messaggio(Messaggio.CANCELLAZIONE, null, nomeUtente, null, null, null, password));
     }
 
-     ArrayList<String> getUtenti(String utente) {
-        Object c = null;
-        try {
-            out.writeInt(5);
-            out.writeUTF(utente);
-            out.flush();
-            return (ArrayList<String>) in.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            //ex.printStackTrace();
-            reconnect();
-            ArrayList<String> temp = new ArrayList<>();
-            temp.add("Errore di comunicazione");
-            return temp;
-        }
-
+    private void connectionError() {
+        msg = new Messaggio(Messaggio.ERRORECONNESSIONE, "Sei disconnesso dal server", null, null, null, null, null);
+        refresh();
     }
 
-     String deleteAccount(String password) {
-        String invio = nomeUtente + "," + password;
+    synchronized void writeToServer(Messaggio send) {
         try {
-            out.writeInt(7);
-            out.writeUTF(invio);
+            //out.reset();
+            //System.out.println(Thread.currentThread().toString()+"  writing  "+socket.toString());
+            out.writeObject(send);
             out.flush();
-            return String.valueOf(in.readObject());
-        } catch (IOException | ClassNotFoundException ex) {
-            reconnect();
-            return "Sei disconnesso dal server";
+        } catch (IOException ex) {
+            connectionError();
         }
     }
 
     static boolean connectionState() {
-        return socket != null ? socket.isConnected() : false;
+        return socket != null ? !socket.isClosed() : false;
     }
 
     public void refresh() {  //aggiorna le viste
         this.setChanged();
         this.notifyObservers();
+        //System.out.println(Thread.currentThread().toString()+"  refreshing  "+socket.toString());
     }
 }

@@ -21,26 +21,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".UserList"
-            android:noHistory="false">
-
-        </activity>
-        <activity
-            android:name=".RegisterActivity"
-            android:noHistory="false"
-            android:excludeFromRecents="true">
-
-        </activity>
-        <activity
+            android:label="@string/home_page"
             android:name=".ChatActivity"
             android:noHistory="false"
             android:excludeFromRecents="true"
             android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-        <activity android:name=".DeleteAccount"
-            android:theme="@style/Theme.AppCompat.DayNight.Dialog"
-            android:excludeFromRecents="true">
 
         </activity>
     </application>

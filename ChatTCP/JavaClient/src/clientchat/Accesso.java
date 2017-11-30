@@ -6,19 +6,25 @@
 package clientchat;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JFrame;
+import oggetti.Messaggio;
 
 /**
  *
  * @author MATTI
  */
-public class Accesso extends javax.swing.JFrame {
+public class Accesso extends JFrame implements Observer {
 
     private Service service;
-    
-    public Accesso() {
+
+    public Accesso(Service ser) {
+        System.out.println("inizio c");
         initComponents();
         suggerimento.setForeground(Color.red);
-        service=new Service();
+        service = ser;
     }
 
     /**
@@ -125,20 +131,23 @@ public class Accesso extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void utenteNonRegistratoMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_utenteNonRegistratoMouseReleased
-        Registrazione r = new Registrazione();
-        r.setVisible(true);
+        service.doRegistrazione();
         dispose();
     }//GEN-LAST:event_utenteNonRegistratoMouseReleased
 
     private void accediMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_accediMouseReleased
-        if (nomeUtente.getText().length() > 0 && password.getText().length() > 0) {
-            logIn(nomeUtente.getText(), password.getText());
-        }
-        if (nomeUtente.getText().length() <= 0) {
-            lNome.setForeground(Color.red);
-        }
-        if (password.getText().length() <= 0) {
-            lPassword.setForeground(Color.red);
+        if (suggerimento.getText().equals("Sei disconnesso dal server")) {
+            service.setConnection();
+        } else {
+            if (nomeUtente.getText().length() > 0 && password.getText().length() > 0) {
+                logIn(nomeUtente.getText(), password.getText());
+            }
+            if (nomeUtente.getText().length() <= 0) {
+                lNome.setForeground(Color.red);
+            }
+            if (password.getText().length() <= 0) {
+                lPassword.setForeground(Color.red);
+            }
         }
     }//GEN-LAST:event_accediMouseReleased
 
@@ -155,46 +164,10 @@ public class Accesso extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Accesso.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Accesso.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Accesso.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Accesso.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Accesso().setVisible(true);
-            }
-        });
-    }
 
     private void logIn(String nomeUtente, String password) {
-        String[] dati = service.accedi(nomeUtente, password);
-        if (!dati[1].equals("1")) {
-            Service.main(new String[]{dati[0], dati[1]});
-            dispose();
-        } else {
-            suggerimento.setText(dati[0]);
-        }
+        service.accedi(nomeUtente, password);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -207,4 +180,38 @@ public class Accesso extends javax.swing.JFrame {
     private javax.swing.JLabel suggerimento;
     private javax.swing.JLabel utenteNonRegistrato;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        Service my = (Service) (o);
+        Messaggio msg = my.msg;
+        if (msg != null) {
+            switch (msg.getFunzione()) {
+                case Messaggio.ACCESSO:
+                    Object dati[] = (Object[]) msg.getMessaggio();
+                    if (!dati[0].equals("1")) {
+                        service.startChatting((String)dati[0],(byte[])dati[1]);
+                        dispose();
+                    } else {
+                        suggerimento.setText((String)dati[1]);
+                    }
+                    break;
+                case Messaggio.ERRORECONNESSIONE:
+                    suggerimento.setText((String) msg.getMessaggio());
+                    accedi.setText("Riprova connessione");
+                    nomeUtente.setEnabled(false);
+                    password.setEnabled(false);
+                    break;
+                case Messaggio.CONNESSO:
+                    suggerimento.setText((String) msg.getMessaggio());
+                    accedi.setText("Accedi");
+                    nomeUtente.setEnabled(true);
+                    password.setEnabled(true);
+                    break;
+                default:
+                    suggerimento.setText("Errore sconosciuto");
+                    break;
+            }
+        }
+    }
 }
