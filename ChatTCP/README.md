@@ -6,7 +6,7 @@ L'idea è di creare una piattaforma raggiungibile a più persone possibili, quindi
 
 - APPLICAZIONE SU PC
 
--CLIENT:
+- CLIENT:
 
 E' stata utilizzata Java Swing per creare l'interfaccia di tutte le classi.
 
@@ -19,7 +19,7 @@ Le classi sono 4:
 
 Ognuna delle classi prevede la gestione di errori come mancato inserimento dati, dati errati ecc.. in modo da garantire all'utente la più semplice navigazione possibile. Gli errori sono ben notificati. Tra la classe Registrazione ed Accesso ci si può andare attraverso dei link di ciascuna interfaccia. La classe Client e Service utilizzano il Design Pattern Observable in modo che l'utente sappia sempre lo stato della connessione col Server.
 
--SERVER:
+- SERVER:
 
 1) Server: classe in cui avviene la comnicazione col client:
 2) SQLHelper: classe in cui avvengono le operazioni sul DataBase.
@@ -46,5 +46,5 @@ ERRORE:
 Il server riscontra il seguente problema: quando due o più client effettuano l'accesso ed iniziano a comunicare, le porte dei client dei differenti Thread vengono confuse tra loro rendendo le applicazioni dei client non utilizzabili.
 
 
-Si ricordi di modificare l'indirizzo ip e il path per il collegamento al database.
+Si ricordi di modificare l'indirizzo ip e il path per il collegamento al database oltre che cambiare l'estensione del file oggetti.zip in oggetti.jar.
 Il database viene creato automaticamente in caso di sua assenza.
