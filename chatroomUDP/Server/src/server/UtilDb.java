@@ -47,6 +47,7 @@ public class UtilDb {
     public static boolean login(String name, String password) throws SQLException, ClassNotFoundException {
         Connection c = connect();
         boolean usrNameFound = false;
+        String pw = new String(password.getBytes());
         String p = "";
         String qry = "SELECT * FROM UTENTI WHERE userName LIKE ?";
         PreparedStatement control = c.prepareStatement(qry);
@@ -56,7 +57,8 @@ public class UtilDb {
             p = rs.getString("password");
             usrNameFound = true;
         }
-        return usrNameFound && p.equals(password);
+        boolean isPwRight = p.equals(pw);
+        return usrNameFound && isPwRight;
     }
 
     public static void inserisciMessaggio(int idUtente, String messaggio) throws SQLException, ClassNotFoundException {

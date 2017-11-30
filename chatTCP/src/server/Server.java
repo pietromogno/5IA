@@ -1,26 +1,32 @@
  package server;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import objects.User;
 
 /**
  * @author Emanuele Pagotto
  */
 public class Server {
     
-    private static ArrayList[] connectedClients;
+    static ArrayList<String> connectedClients;
+    static ArrayList<Socket> clientSockets;
+    static ExecutorService threadExe;
+    static ServerSocket mainSck;
+    static boolean connectedClientsChanged;
     
     public static void main(String[] args) {
         try {
-            connectedClients = new ArrayList[]{new ArrayList<String>(), new ArrayList<Socket>()};
+            connectedClients = new ArrayList<>();
+            clientSockets = new ArrayList<>();
             System.out.println("The server has started");
-            ExecutorService threadExe = Executors.newCachedThreadPool();
-            ServerSocket mainSck = new ServerSocket(9090);
+            threadExe = Executors.newCachedThreadPool();
+            mainSck = new ServerSocket(9090);
+            connectedClientsChanged = false;
             while (true) {
                 Socket threadSck = mainSck.accept();
                 threadExe.execute(new ManageClient(threadSck));
@@ -33,13 +39,10 @@ public class Server {
         }
     }
     
-    protected static int addConnectedUser(String n, Socket s){
-        connectedClients[0].add(n);
-        connectedClients[1].add(s);
-        return connectedClients[1].size();
+    protected static int addConnectedUser(String n, Socket s) throws IOException{
+        connectedClients.add(n);
+        clientSockets.add(s);
+        connectedClientsChanged = true;
+        return connectedClients.size();
     }
-    
-    /*public static User[] getConnectedUsers(){
-        return (User []) connectedClients.toArray();
-    }*/
 }

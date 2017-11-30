@@ -64,7 +64,7 @@ public class SQLhelper {
     public static void inserisciMessaggio(Message m) throws ClassNotFoundException, SQLException {
         Connection c = connect();
         String qry = "INSERT INTO MESSAGGI(messaggio)"
-                    +"VALUES(?)";
+                + "VALUES(?)";
         PreparedStatement control = c.prepareStatement(qry);
         control.setString(1, m.getMessage());
         control.executeUpdate();
@@ -72,10 +72,10 @@ public class SQLhelper {
         control = c.prepareStatement(qry);
         int max = control.executeQuery().getInt("idMessaggio");
         qry = "INSERT INTO CHAT(idUtenteA,idUtenteB,idMessaggio)"
-             +"VALUES(?,?,?)";
+                + "VALUES(?,?,?)";
         control = c.prepareStatement(qry);
-        control.setInt(1, m.getSrc());
-        control.setInt(2, m.getDst());
+        control.setInt(1, getIdByName(m.getSrc()));
+        control.setInt(2, getIdByName(m.getDst()));
         control.setInt(3, max);
         control.executeUpdate();
     }
@@ -88,17 +88,32 @@ public class SQLhelper {
         control.setInt(1, idUtente);
         control.setInt(2, idUtente);
         ResultSet chat = control.executeQuery();
-        while(chat.next()){
+        while (chat.next()) {
             int src = chat.getInt("idUtenteA");
             int dst = chat.getInt("idUtenteB");
             qry = "SELECT * FROM MESSAGGI WHERE idMessaggio = ?";
             control = c.prepareStatement(qry);
-            control.setInt(1,chat.getInt("idMessaggio"));
+            control.setInt(1, chat.getInt("idMessaggio"));
             ResultSet message = control.executeQuery();
-            Message m = new Message(message.getString("messaggio"),chat.getInt("idUtenteA"),chat.getInt("idUtenteB"));
+            Message m = new Message((message.getString("messaggio")), getNameById(src), getNameById(dst));
             ris.add(m);
         }
         return ris;
     }
 
+    public static String getNameById(int id) throws ClassNotFoundException, SQLException {
+        Connection c = connect();
+        String qry = "SELECT nomeUtente FROM UTENTI WHERE idUtente = ?";
+        PreparedStatement control = c.prepareStatement(qry);
+        control.setInt(0, id);
+        return control.executeQuery().getString("nomeUtente");
+    }
+
+    public static int getIdByName(String nome) throws ClassNotFoundException, SQLException {
+        Connection c = connect();
+        String qry = "SELECT idUtente FROM UTENTI WHERE nomeUtente = ?";
+        PreparedStatement control = c.prepareStatement(qry);
+        control.setString(0, nome);
+        return control.executeQuery().getInt("idUtente");
+    }
 }

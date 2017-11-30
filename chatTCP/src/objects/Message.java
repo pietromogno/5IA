@@ -6,9 +6,9 @@ package objects;
 public class Message implements java.io.Serializable {
     String message, username ,password;
     int type; //cambia in base alla funzione che il messaggio deve svolgere. 0 indica login, 1 indica register, 2 indica standardMessage
-    int src, dst; //tramite id si risale al destinatario e il destinatario può sapere da chi arriva al messaggio
+    String src, dst; //tramite id si risale al destinatario e il destinatario può sapere da chi arriva al messaggio
 
-    public Message(String message,int dst,int src) { //Costruttore per standardMessage
+    public Message(String message,String dst,String src) { //Costruttore per standardMessage
         this.message = message;
         this.type = 2;
         this.src = src;
@@ -41,11 +41,11 @@ public class Message implements java.io.Serializable {
         return type;
     }
     
-    public int getSrc(){
+    public String getSrc(){
         return src;
     }
     
-    public int getDst(){
+    public String getDst(){
         return dst;
     }
 }

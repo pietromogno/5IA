@@ -1,8 +1,11 @@
 package Client;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JLabel;
 
 /**
  * @author Emanuele Pagotto
@@ -11,7 +14,15 @@ public class ClientForm extends javax.swing.JFrame {
 
     public ClientForm() {
         initComponents();
+        client = new Client("localhost", 9090);
+        messages = new ArrayList<>();
+        utenti = new ArrayList<>();
+        cbNeedUpdate = false;
+        msgNeedUpdate = false;
+        chatNeedUpdate = 0;
+        up = new Update();
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -19,8 +30,7 @@ public class ClientForm extends javax.swing.JFrame {
         chat = new javax.swing.JPanel();
         txt_Msg = new javax.swing.JTextField();
         btn_Invia = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        cb_Clients = new javax.swing.JComboBox<>();
+        pnl_Chat = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         txt_userName = new javax.swing.JTextField();
         txt_password = new javax.swing.JTextField();
@@ -29,10 +39,16 @@ public class ClientForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         lbl_Msg = new javax.swing.JLabel();
+        cb_clients = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("chat TCP");
         setBackground(new java.awt.Color(255, 255, 255));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         btn_Invia.setText("->");
         btn_Invia.addActionListener(new java.awt.event.ActionListener() {
@@ -51,12 +67,12 @@ public class ClientForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_Invia)
                 .addContainerGap())
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(pnl_Chat, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         chatLayout.setVerticalGroup(
             chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chatLayout.createSequentialGroup()
-                .addComponent(jScrollPane1)
+                .addComponent(pnl_Chat)
                 .addGap(18, 18, 18)
                 .addGroup(chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txt_Msg)
@@ -137,9 +153,9 @@ public class ClientForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cb_Clients, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lbl_Msg, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lbl_Msg, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cb_clients, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -154,9 +170,9 @@ public class ClientForm extends javax.swing.JFrame {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lbl_Msg)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(cb_Clients, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 380, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cb_clients, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 385, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -165,8 +181,7 @@ public class ClientForm extends javax.swing.JFrame {
 
     private void btn_logIOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logIOActionPerformed
         try {
-            String text = client.login(txt_userName.getText(),txt_userName.getText());
-            lbl_Msg.setText(text);
+            client.login(txt_userName.getText(), txt_password.getText());
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -174,16 +189,20 @@ public class ClientForm extends javax.swing.JFrame {
 
     private void btn_registraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_registraActionPerformed
         try {
-            String text = client.register(txt_userName.getText(),txt_userName.getText());
-            lbl_Msg.setText(text);
+            client.register(txt_userName.getText(), txt_password.getText());
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btn_registraActionPerformed
 
     private void btn_InviaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_InviaActionPerformed
-        client.sendMessage(txt_Msg.getText(), cb_Clients.getSelectedIndex());
+        client.sendMessage(txt_Msg.getText(), (String) cb_clients.getSelectedItem());
     }//GEN-LAST:event_btn_InviaActionPerformed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        up.start();
+        client.startMessageReceiver();
+    }//GEN-LAST:event_formWindowActivated
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -218,22 +237,101 @@ public class ClientForm extends javax.swing.JFrame {
         });
     }
 
+    public void updateCBox() {
+        String[] dati;
+        if (utenti.size() > 0) {
+            dati = new String[utenti.size()];
+            System.out.println("Mannaggia a te cBox");
+            utenti.toArray(dati);
+        } else {
+            dati = new String[]{"non c'è nessuno online"};
+        }
+        this.cb_clients.setModel(new DefaultComboBoxModel<>(dati));
+        cbNeedUpdate = false;
+
+    }
+
+    public void updateMsg() {
+        this.lbl_Msg.setText(messaggio);
+        System.out.println("Mannaggia a te messaggio");
+        msgNeedUpdate = false;
+    }
+
+    public void updateChat() {
+        while (chatNeedUpdate < messages.size()) {
+            pnl_Chat.add(new JLabel(messaggio));
+            chatNeedUpdate++;
+        }
+    }
+
+    public static void addToChat(String m) {
+        messages.add(m);
+    }
+
+    public static void receiveCBoxData(String u) {
+        utenti.add(u);
+        cbNeedUpdate = true;
+    }
+
+    public static void receiveMsg(String m) {
+        messaggio = m;
+        cbNeedUpdate = true;
+    }
+
+    class Update extends Thread {
+
+        private final long SECOND = 1000;
+
+        public Update() {
+        }
+
+        @Override
+        public synchronized void run() {
+            try {
+                while (true) {
+                    wait(SECOND);
+                    if (msgNeedUpdate) {
+                        updateMsg();
+                    }
+                    if (cbNeedUpdate) {
+                        updateCBox();
+                    }
+                    if (chatNeedUpdate <= messages.size()) {
+                        updateChat();
+                    }
+                }
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
+
+            }
+
+        }
+
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Invia;
     private javax.swing.JButton btn_logIO;
     private javax.swing.JButton btn_registra;
-    private javax.swing.JComboBox<String> cb_Clients;
+    private javax.swing.JComboBox<String> cb_clients;
     private javax.swing.JPanel chat;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_Msg;
+    private javax.swing.JScrollPane pnl_Chat;
     private javax.swing.JTextField txt_Msg;
     private javax.swing.JTextField txt_password;
     private javax.swing.JTextField txt_userName;
     // End of variables declaration//GEN-END:variables
     //User declared variables - modify with caution
     private Client client;
+    private Update up;
+    public static String messaggio;
+    public static ArrayList<String> messages;
+    private static ArrayList<String> utenti;
+    public static boolean msgNeedUpdate;
+    private static boolean cbNeedUpdate;
+    private static int chatNeedUpdate;
     //End of user declared variables
 }

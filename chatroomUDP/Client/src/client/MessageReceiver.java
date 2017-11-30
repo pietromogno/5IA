@@ -12,7 +12,7 @@ import java.net.*;
  *
  * @author Pagotto Emanuele
  */
-class MessageReceiver implements Runnable {
+class MessageReceiver extends Thread {
 
     private final DatagramSocket socket;
     private final byte[] buffer;
@@ -29,6 +29,7 @@ class MessageReceiver implements Runnable {
                 DatagramPacket message = new DatagramPacket(buffer, buffer.length);
                 socket.receive(message);
                 String received = new String(message.getData(), 0, message.getLength());
+                Client.updateForm(received);
             } catch (IOException e) {
                 System.err.println("Client Error: " + e.getMessage());
                 System.err.println("Localized: " + e.getLocalizedMessage());
