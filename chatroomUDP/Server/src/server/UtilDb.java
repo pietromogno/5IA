@@ -47,7 +47,6 @@ public class UtilDb {
     public static boolean login(String name, String password) throws SQLException, ClassNotFoundException {
         Connection c = connect();
         boolean usrNameFound = false;
-        String pw = new String(password.getBytes());
         String p = "";
         String qry = "SELECT * FROM UTENTI WHERE userName LIKE ?";
         PreparedStatement control = c.prepareStatement(qry);
@@ -55,9 +54,11 @@ public class UtilDb {
         ResultSet rs = control.executeQuery();
         if (rs.next()) {
             p = rs.getString("password");
+            System.out.println(p.length());
+            System.out.println(password.length());
             usrNameFound = true;
         }
-        boolean isPwRight = p.equals(pw);
+        boolean isPwRight = p.equals(password);
         return usrNameFound && isPwRight;
     }
 
@@ -77,7 +78,9 @@ public class UtilDb {
         PreparedStatement control = c.prepareStatement(qry);
         ResultSet rs = control.executeQuery();
         while (rs.next()) {
-            chat.add(getNameById(rs.getInt("idUtente"))+": "+rs.getString("messaggio"));
+			int id = rs.getInt("idUtente");
+			String m = rs.getString("messaggio");
+            chat.add(getNameById(id)+": "+m);
         }
         return chat;
     }
@@ -93,13 +96,9 @@ public class UtilDb {
     public static String getNameById(int id) throws SQLException, ClassNotFoundException {
         Connection c = connect();
         String qry = "SELECT * FROM UTENTI WHERE idUtente=?";
-        PreparedStatement control = c.prepareCall(qry);
+        PreparedStatement control = c.prepareStatement(qry);
         control.setInt(1, id);
         return control.executeQuery().getString("userName");
-    }
-
-    static ArrayList<String> getMessages(int PORT) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

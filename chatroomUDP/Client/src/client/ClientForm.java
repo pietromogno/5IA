@@ -15,15 +15,15 @@ import java.util.logging.Logger;
  */
 public class ClientForm extends javax.swing.JFrame {
 
-    /**
-     * Creates new form ClientForm
-     */
-    public ClientForm() {
-        initComponents();
-        setVisible(true);
-    }
-    
-    @SuppressWarnings("unchecked")
+	/**
+	 * Creates new form ClientForm
+	 */
+	public ClientForm() {
+		initComponents();
+		setVisible(true);
+	}
+
+	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -46,6 +46,11 @@ public class ClientForm extends javax.swing.JFrame {
         chat.setViewportView(chatArea);
 
         invia.setText("->");
+        invia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inviaActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Username");
 
@@ -82,7 +87,7 @@ public class ClientForm extends javax.swing.JFrame {
                             .addComponent(txt_Pw, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btn_Register)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
                         .addComponent(btn_Login))
                     .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -128,24 +133,33 @@ public class ClientForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_LoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_LoginActionPerformed
-        try {
-            String m = "login "+txt_UserName.getText()+" "+txt_Pw.getText();
-            Client.sendMessage(m);
-            System.out.println(m);
-        } catch (IOException ex) {
-            Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		try {
+			String m = "login " + txt_UserName.getText() + " " + txt_Pw.getText();
+			Client.sendMessage(m);
+			System.out.println(m);
+		} catch (IOException ex) {
+			Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
+		}
     }//GEN-LAST:event_btn_LoginActionPerformed
 
     private void btn_RegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RegisterActionPerformed
-        try {
-            String m = "register "+txt_UserName.getText()+" "+txt_Pw.getText();
-            Client.sendMessage(m);
-            System.out.println(m);
-        } catch (IOException ex) {
-            Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		try {
+			String m = "register " + txt_UserName.getText() + " " + txt_Pw.getText();
+			Client.sendMessage(m);
+			System.out.println(m);
+		} catch (IOException ex) {
+			Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
+		}
     }//GEN-LAST:event_btn_RegisterActionPerformed
+
+    private void inviaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inviaActionPerformed
+		try {
+			String m = "msg " + txt_UserName.getText() + " " + txt_Msg.getText();
+			Client.sendMessage(m);
+		} catch (IOException ex) {
+			Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
+		}
+    }//GEN-LAST:event_inviaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Login;

@@ -30,10 +30,9 @@ class ServerThread extends Thread {
 
     private static final int PORT = 4445;
     private DatagramSocket socket;
-    private DatagramPacket packet;
     private ArrayList<Utente> utenti;
     private ArrayList<String> chat;
-    private byte[] buffer;
+    private byte[] buffer_in, buffer_out;
 
     public ServerThread() throws SocketException, SQLException, ClassNotFoundException {
         this("ServerThread");
@@ -41,8 +40,8 @@ class ServerThread extends Thread {
 
     public ServerThread(String name) throws SocketException, SQLException, ClassNotFoundException {
         socket = new DatagramSocket(PORT);
-        byte[] buffer = new byte[1024];
-        packet = new DatagramPacket(buffer, buffer.length);
+        buffer_in = new byte[1024];
+        buffer_out = new byte[1024];
         utenti = new ArrayList<>();
         chat = UtilDb.getMessages();
     }
@@ -51,15 +50,18 @@ class ServerThread extends Thread {
     public void run() {
         try {
             while (true) {
-                socket.receive(packet);
-                String message = new String(packet.getData());
+                buffer_in = new byte[1024];
+                DatagramPacket packet_in = new DatagramPacket(buffer_in, buffer_in.length);
+                socket.receive(packet_in);
+                buffer_in = packet_in.getData();
+                String message = new String(buffer_in, 0, packet_in.getLength());
                 String op = message.substring(0, message.indexOf(" "));
                 if (op.equals("login")) {
-                    login();
+                    login(packet_in);
                 } else if (op.equals("register")) {
-                    register();
-                } else {
-                    receiveMessage();
+                    register(packet_in);
+                } else if (op.equals("msg")) {
+                    receiveMessage(message.substring(message.indexOf(" ") + 1));
                 }
             }
         } catch (IOException | SQLException | ClassNotFoundException e) {
@@ -71,7 +73,7 @@ class ServerThread extends Thread {
     }
 
     private String getParam(String s, boolean p) {
-        return (p) ? (s.substring(s.indexOf(" ")+1, s.lastIndexOf(" "))) : (s.substring(s.lastIndexOf(" ")+1, s.length()));
+        return (p) ? (s.substring(s.indexOf(" ") + 1, s.lastIndexOf(" "))) : (s.substring(s.lastIndexOf(" ") + 1, s.length()));
     }
 
     private int getIdByAddress(InetAddress a) {
@@ -83,45 +85,51 @@ class ServerThread extends Thread {
     }
 
     private void updateClient(Utente u) throws SQLException, ClassNotFoundException, IOException {
+        buffer_out = ("l " + chat.size()).getBytes();
+        socket.send(new DatagramPacket(buffer_out, buffer_out.length, u.getAddress(), u.getPORT()));
         for (String m : chat) {
-            buffer = m.getBytes();
-            socket.send(new DatagramPacket(buffer, buffer.length, u.getAddress(), u.getPORT()));
+            buffer_out = m.getBytes();
+            socket.send(new DatagramPacket(buffer_out, buffer_out.length, u.getAddress(), u.getPORT()));
         }
     }
 
-    private void login() throws SQLException, ClassNotFoundException, IOException {
-        String username = getParam(new String(packet.getData()), true);
-        String password = getParam(new String(packet.getData()), false);
-        System.out.println(username.replace(" ", "_")+" "+password.replace(" ", "_"));
+    private void login(DatagramPacket packet) throws SQLException, ClassNotFoundException, IOException {
+        String m = new String(buffer_in, 0, packet.getLength());
+        String username = getParam(m, true);
+        String password = getParam(m, false);
+        //System.out.println(username.replace(" ", "_") + " " + password.replace(" ", "_"));
         if (UtilDb.login(username, password)) {
-            buffer = "ok Login Effettuato".getBytes();
-            socket.send(new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort()));
+            buffer_out = "ok Login Effettuato".getBytes();
+            socket.send(new DatagramPacket(buffer_out, buffer_out.length, packet.getAddress(), packet.getPort()));
             Utente u = new Utente(packet.getAddress(), packet.getPort(), UtilDb.getIdByName(username), username);
             utenti.add(u);
             updateClient(u);
         } else {
-            buffer = "err Dati di login Errati".getBytes();
-            socket.send(new DatagramPacket(buffer, buffer.length, packet.getAddress(), packet.getPort()));
+            buffer_out = "err Dati di login Errati".getBytes();
+            socket.send(new DatagramPacket(buffer_out, buffer_out.length, packet.getAddress(), packet.getPort()));
         }
 
     }
 
-    private void register() throws SQLException, ClassNotFoundException, IOException {
-        String username = getParam(new String(packet.getData()), true);
-        String password = getParam(new String(packet.getData()), false);
+    private void register(DatagramPacket packet) throws SQLException, ClassNotFoundException, IOException {
+        String m = new String(buffer_in, 0, packet.getLength());
+        String username = getParam(m, true);
+        String password = getParam(m, false);
         if (UtilDb.register(username, password)) {
-            buffer = "ok Registrazione effettuata".getBytes();
+            buffer_out = "ok Registrazione effettuata".getBytes();
         } else {
-            buffer = "err Dati già esistenti".getBytes();
+            buffer_out = "err Dati già esistenti".getBytes();
         }
-        socket.send(new DatagramPacket(buffer, buffer.length,packet.getAddress(),packet.getPort()));
+        socket.send(new DatagramPacket(buffer_out, buffer_out.length, packet.getAddress(), packet.getPort()));
     }
 
-    private void receiveMessage() throws IOException, SQLException, ClassNotFoundException {
-        String messaggio = new String(packet.getData());
-        int id = getIdByAddress(packet.getAddress());
-        UtilDb.inserisciMessaggio(id, messaggio);
-        chat.add(id + ": " + messaggio);
+    private void receiveMessage(String m) throws IOException, SQLException, ClassNotFoundException {
+        String utente = m.substring(0,m.indexOf(" "));
+        int id = UtilDb.getIdByName(utente);
+        String message = m.substring(m.indexOf(" ") + 1);
+        m = m.substring(m.indexOf(" "));
+        UtilDb.inserisciMessaggio(id, message);
+        chat.add(utente + ": " + m);
         for (Utente u : utenti) {
             updateClient(u);
         }
