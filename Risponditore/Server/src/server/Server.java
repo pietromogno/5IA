@@ -1,4 +1,4 @@
-package risponditore;
+package server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,12 +49,16 @@ class ConnectClient implements Runnable /*extends Thread*/ {
             PrintWriter writer = new PrintWriter(s.getOutputStream(), true);
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             while (!conversazioneFinita) {
-                writer.println(automa.getCurrentState() + "\n" + automa.getPossibleAnswers());
+                writer.println(automa.getCurrentState());
                 String input = reader.readLine();
                 automa.executeUpdate(Integer.parseInt(input));
                 conversazioneFinita = automa.isConversationEnded();
             }
-            writer.print("exit");
+            writer.println(automa.getCurrentState());
+            automa.executeUpdate(0);
+            writer.println(automa.getCurrentState());
+            writer.print("exit \n ");
+            s.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

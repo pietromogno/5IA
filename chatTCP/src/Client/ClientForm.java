@@ -241,8 +241,10 @@ public class ClientForm extends javax.swing.JFrame {
         String[] dati;
         if (utenti.size() > 0) {
             dati = new String[utenti.size()];
-            System.out.println("Mannaggia a te cBox");
             utenti.toArray(dati);
+            for(String s : dati){
+                System.out.println(s);
+            }
         } else {
             dati = new String[]{"non c'è nessuno online"};
         }
@@ -253,7 +255,6 @@ public class ClientForm extends javax.swing.JFrame {
 
     public void updateMsg() {
         this.lbl_Msg.setText(messaggio);
-        System.out.println("Mannaggia a te messaggio");
         msgNeedUpdate = false;
     }
 
@@ -287,24 +288,22 @@ public class ClientForm extends javax.swing.JFrame {
 
         @Override
         public synchronized void run() {
-            try {
-                while (true) {
-                    wait(SECOND);
-                    if (msgNeedUpdate) {
-                        updateMsg();
-                    }
-                    if (cbNeedUpdate) {
-                        updateCBox();
-                    }
-                    if (chatNeedUpdate <= messages.size()) {
-                        updateChat();
-                    }
+            try{
+            while (true) {
+                wait(SECOND);
+                if (ClientForm.msgNeedUpdate) {
+                    updateMsg();
                 }
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
-
+                if (ClientForm.cbNeedUpdate) {
+                    updateCBox();
+                }
+                if (ClientForm.chatNeedUpdate <= ClientForm.messages.size()) {
+                    updateChat();
+                }
             }
-
+            }catch(InterruptedException e){
+                System.out.println("ops");
+            }
         }
 
     }

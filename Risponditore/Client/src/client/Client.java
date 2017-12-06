@@ -1,4 +1,4 @@
-package risponditore;
+package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class Client {
     public static void connect() throws IOException {
         s = new Socket("localhost", 9090);
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        out = new PrintWriter(s.getOutputStream());
+        out = new PrintWriter(s.getOutputStream(),true);
         kbrd = new Scanner(System.in);
     }
 
@@ -37,6 +37,7 @@ public class Client {
                     out.println(output);
                 }
             }
+            s.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
