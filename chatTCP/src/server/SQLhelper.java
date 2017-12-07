@@ -83,7 +83,7 @@ public class SQLhelper {
     public static ArrayList<Message> getMessages(int idUtente) throws SQLException, ClassNotFoundException {
         ArrayList<Message> ris = new ArrayList<>();
         Connection c = connect();
-        String qry = "SELECT * FROM CHAT WHERE idUtenteA = ? OR idUtenteB = ?";
+        String qry = "SELECT * FROM CHAT WHERE idUtenteA LIKE ? OR idUtenteB LIKE ?";
         PreparedStatement control = c.prepareStatement(qry);
         control.setInt(1, idUtente);
         control.setInt(2, idUtente);
@@ -95,7 +95,7 @@ public class SQLhelper {
             control = c.prepareStatement(qry);
             control.setInt(1, chat.getInt("idMessaggio"));
             ResultSet message = control.executeQuery();
-            Message m = new Message((message.getString("messaggio")), getNameById(src), getNameById(dst));
+            Message m = new Message(message.getString("messaggio"), getNameById(src), getNameById(dst), "");
             ris.add(m);
         }
         return ris;
@@ -103,17 +103,17 @@ public class SQLhelper {
 
     public static String getNameById(int id) throws ClassNotFoundException, SQLException {
         Connection c = connect();
-        String qry = "SELECT nomeUtente FROM UTENTI WHERE idUtente = ?";
+        String qry = "SELECT nomeUtente FROM UTENTI WHERE idUtente LIKE ?";
         PreparedStatement control = c.prepareStatement(qry);
-        control.setInt(0, id);
+        control.setInt(1, id);
         return control.executeQuery().getString("nomeUtente");
     }
 
     public static int getIdByName(String nome) throws ClassNotFoundException, SQLException {
         Connection c = connect();
-        String qry = "SELECT idUtente FROM UTENTI WHERE nomeUtente = ?";
+        String qry = "SELECT idUtente FROM UTENTI WHERE nomeUtente LIKE ?";
         PreparedStatement control = c.prepareStatement(qry);
-        control.setString(0, nome);
+        control.setString(1, nome);
         return control.executeQuery().getInt("idUtente");
     }
 }

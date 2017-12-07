@@ -1,11 +1,11 @@
 package Client;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
+import objects.Message;
 
 /**
  * @author Emanuele Pagotto
@@ -14,13 +14,7 @@ public class ClientForm extends javax.swing.JFrame {
 
     public ClientForm() {
         initComponents();
-        client = new Client("localhost", 9090);
-        messages = new ArrayList<>();
-        utenti = new ArrayList<>();
-        cbNeedUpdate = false;
-        msgNeedUpdate = false;
-        chatNeedUpdate = 0;
-        up = new Update();
+        this.setVisible(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -31,6 +25,7 @@ public class ClientForm extends javax.swing.JFrame {
         txt_Msg = new javax.swing.JTextField();
         btn_Invia = new javax.swing.JButton();
         pnl_Chat = new javax.swing.JScrollPane();
+        txt_Chat = new javax.swing.JTextPane();
         jPanel1 = new javax.swing.JPanel();
         txt_userName = new javax.swing.JTextField();
         txt_password = new javax.swing.JTextField();
@@ -44,11 +39,6 @@ public class ClientForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("chat TCP");
         setBackground(new java.awt.Color(255, 255, 255));
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowActivated(java.awt.event.WindowEvent evt) {
-                formWindowActivated(evt);
-            }
-        });
 
         btn_Invia.setText("->");
         btn_Invia.addActionListener(new java.awt.event.ActionListener() {
@@ -56,6 +46,9 @@ public class ClientForm extends javax.swing.JFrame {
                 btn_InviaActionPerformed(evt);
             }
         });
+
+        pnl_Chat.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pnl_Chat.setViewportView(txt_Chat);
 
         javax.swing.GroupLayout chatLayout = new javax.swing.GroupLayout(chat);
         chat.setLayout(chatLayout);
@@ -146,6 +139,12 @@ public class ClientForm extends javax.swing.JFrame {
 
         lbl_Msg.setText("Registrati o accedi!");
 
+        cb_clients.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cb_clientsItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -180,132 +179,42 @@ public class ClientForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_logIOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logIOActionPerformed
-        try {
-            client.login(txt_userName.getText(), txt_password.getText());
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Client.sendMessage(txt_password.getText(), txt_userName.getText(), "Server", "login");
     }//GEN-LAST:event_btn_logIOActionPerformed
 
     private void btn_registraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_registraActionPerformed
-        try {
-            client.register(txt_userName.getText(), txt_password.getText());
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(ClientForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Client.sendMessage(txt_password.getText(), txt_userName.getText(), "Server", "register");
     }//GEN-LAST:event_btn_registraActionPerformed
 
     private void btn_InviaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_InviaActionPerformed
-        client.sendMessage(txt_Msg.getText(), (String) cb_clients.getSelectedItem());
+        Client.sendMessage(txt_password.getText(), txt_userName.getText(), cb_clients.getSelectedItem().toString(), "login");
     }//GEN-LAST:event_btn_InviaActionPerformed
 
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        up.start();
-        client.startMessageReceiver();
-    }//GEN-LAST:event_formWindowActivated
+    private void cb_clientsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cb_clientsItemStateChanged
+        Client.getChat(this.cb_clients.getSelectedItem().toString());
+    }//GEN-LAST:event_cb_clientsItemStateChanged
 
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ClientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ClientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ClientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ClientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ClientForm().setVisible(true);
-            }
-        });
+    public void updateCbox(String[] users) {
+        this.cb_clients.setModel(new DefaultComboBoxModel<>(users));
     }
 
-    public void updateCBox() {
-        String[] dati;
-        if (utenti.size() > 0) {
-            dati = new String[utenti.size()];
-            utenti.toArray(dati);
-            for(String s : dati){
-                System.out.println(s);
-            }
-        } else {
-            dati = new String[]{"non c'è nessuno online"};
-        }
-        this.cb_clients.setModel(new DefaultComboBoxModel<>(dati));
-        cbNeedUpdate = false;
-
+    public void updateNotification(String m) {
+        this.lbl_Msg.setText(m);
     }
 
-    public void updateMsg() {
-        this.lbl_Msg.setText(messaggio);
-        msgNeedUpdate = false;
-    }
-
-    public void updateChat() {
-        while (chatNeedUpdate < messages.size()) {
-            pnl_Chat.add(new JLabel(messaggio));
-            chatNeedUpdate++;
-        }
-    }
-
-    public static void addToChat(String m) {
-        messages.add(m);
-    }
-
-    public static void receiveCBoxData(String u) {
-        utenti.add(u);
-        cbNeedUpdate = true;
-    }
-
-    public static void receiveMsg(String m) {
-        messaggio = m;
-        cbNeedUpdate = true;
-    }
-
-    class Update extends Thread {
-
-        private final long SECOND = 1000;
-
-        public Update() {
-        }
-
-        @Override
-        public synchronized void run() {
-            try{
-            while (true) {
-                wait(SECOND);
-                if (ClientForm.msgNeedUpdate) {
-                    updateMsg();
-                }
-                if (ClientForm.cbNeedUpdate) {
-                    updateCBox();
-                }
-                if (ClientForm.chatNeedUpdate <= ClientForm.messages.size()) {
-                    updateChat();
-                }
-            }
-            }catch(InterruptedException e){
-                System.out.println("ops");
+    public void updateChat(Message[] chat) {
+        for (Message m : chat) {
+            String out = m.getMessage();
+            if (m.getSrc().equals(Client.userName)) {
+                JLabel line = new JLabel(out);
+                this.txt_Chat.add(line);
+                this.txt_Chat.setAlignmentX(RIGHT_ALIGNMENT);
+            } else {
+                JLabel line = new JLabel(m.getSrc() + ": " + out);
+                this.txt_Chat.add(line);
+                this.txt_Chat.setAlignmentX(LEFT_ALIGNMENT);
             }
         }
-
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -319,18 +228,9 @@ public class ClientForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lbl_Msg;
     private javax.swing.JScrollPane pnl_Chat;
+    private javax.swing.JTextPane txt_Chat;
     private javax.swing.JTextField txt_Msg;
     private javax.swing.JTextField txt_password;
     private javax.swing.JTextField txt_userName;
     // End of variables declaration//GEN-END:variables
-    //User declared variables - modify with caution
-    private Client client;
-    private Update up;
-    public static String messaggio;
-    public static ArrayList<String> messages;
-    private static ArrayList<String> utenti;
-    public static boolean msgNeedUpdate;
-    private static boolean cbNeedUpdate;
-    private static int chatNeedUpdate;
-    //End of user declared variables
 }

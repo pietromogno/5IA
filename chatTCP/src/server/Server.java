@@ -45,4 +45,10 @@ public class Server {
         connectedClientsChanged = true;
         return connectedClients.size();
     }
+    
+    protected static void disconnect(String n,Socket s){
+        connectedClients.remove(n);
+        clientSockets.remove(s);
+        connectedClientsChanged = true;
+    }
 }

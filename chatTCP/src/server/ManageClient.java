@@ -16,6 +16,7 @@ class ManageClient implements Runnable {
     private ObjectOutputStream out; //stream in output
     private boolean isLoggedIn;
     private int clientId, lastMessageSent;
+    private String clientUsername;
 
     //costruttore
     public ManageClient(Socket sck) {
@@ -40,15 +41,15 @@ class ManageClient implements Runnable {
         try {
             while (true) {
                 Message m = (Message) in.readObject();
-                int type = m.getType();
-                if (type == 0) {
-                    login(m);
-                } else if (type == 1) {
-                    register(m);
+                String op = m.getOp();
+                if (op.equals("login")) {
+                    login(m.getSrc(), m.getMessage());
+                } else if (op.equals("register")) {
+                    register(m.getSrc(), m.getMessage());
                 } else {
                     registerMessage(m);
                 }
-                if (isLoggedIn && Server.connectedClientsChanged) {
+                if (isLoggedIn) {
                     sendConnUsers();
                 }
             }
@@ -60,35 +61,39 @@ class ManageClient implements Runnable {
         }
     }
 
-    public void register(Message m) throws SQLException, ClassNotFoundException, IOException { //mi registro sul database
-        if (SQLhelper.register(m.getName(), m.getPw())) {
-            out.writeObject("msg Registrazione effettuata con successo");
-            System.out.println("Utente " + m.getName() + " Collegato");
+    public void register(String usrName, String pw) throws SQLException, ClassNotFoundException, IOException { //mi registro sul database
+        if (SQLhelper.register(usrName, pw)) {
+            out.writeObject(new Message("Registrazione effettuata", "server", usrName, "msg"));
+            System.out.println("Utente " + usrName + " Collegato");
         } else {
-            out.writeObject("msg Il nome utente esiste già");
+            out.writeObject(new Message("Nome utente già esistente", "server", usrName, "msg"));
         }
     }
 
-    public void login(Message m) throws SQLException, ClassNotFoundException, IOException { //faccio il login confrontando il database
+    public void login(String usrName, String pw) throws SQLException, ClassNotFoundException, IOException { //faccio il login confrontando il database
         if (!isLoggedIn) { //se il client su questo socket non ha ancora fatto il login
-            if (SQLhelper.login(m.getName(), m.getPw())) { //faccio il login
-                this.clientId = Server.addConnectedUser(m.getName(), this.s);
-                out.writeObject("msg Login effettuato come " + m.getName() + "(#" + clientId + ")");
+            if (SQLhelper.login(usrName, pw)) { //faccio il login
+                System.out.println("aaaa");
+                this.clientId = Server.addConnectedUser(usrName, this.s);
+                this.clientUsername = usrName;
+                out.writeObject(new Message("Login effettuato come " + usrName + "(#" + clientId + ")", "server", usrName, "msg"));
                 isLoggedIn = true;
+                sendChat();
             } else {
-                out.writeObject("msg Dati non corretti"); //ma i dati potrebbero non essere giusti...
+                out.writeObject(new Message("Dati errati", "server", usrName, "msg")); //ma i dati potrebbero non essere giusti...
             }
         } else { //altrimenti
-            out.writeObject("msg Hai già effettuato il login"); //è mona
+            out.writeObject(new Message("Login già effettuato", "server", usrName, "msg")); //è mona
         }
     }
 
     public void sendChat() throws SQLException, ClassNotFoundException, IOException {
         ArrayList<Message> chat = SQLhelper.getMessages(clientId);
         int messagesToSend = chat.size() - lastMessageSent;
-        out.writeInt(messagesToSend);
+        out.writeObject(new Message(messagesToSend + "", "server", clientUsername, "chat"));
         while (lastMessageSent < messagesToSend) {
-            out.writeObject(chat.get(lastMessageSent).getMessage());
+            Message m = chat.get(lastMessageSent);
+            out.writeObject(new Message(m.getMessage(), m.getSrc(), m.getDst(), ""));
             lastMessageSent++;
         }
     }
@@ -97,9 +102,10 @@ class ManageClient implements Runnable {
         SQLhelper.inserisciMessaggio(m);
     }
 
-    private void sendConnUsers() throws IOException {
+    private void sendConnUsers() throws IOException, ClassNotFoundException, SQLException {
+        out.writeObject(new Message(Server.connectedClients.size() + "", "server", clientUsername, "conn"));
         for (String u : Server.connectedClients) {
-            out.writeObject(u);
+            out.writeObject(new Message(u, "server", clientUsername, ""));
         }
     }
 }
