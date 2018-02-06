@@ -26,33 +26,45 @@
 
     <TableLayout
         android:id="@+id/tictactoe"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
-        android:weightSum="3"
+        android:background="@drawable/grid"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/p1">
+        app:layout_constraintTop_toBottomOf="@id/p1"
+        app:layout_constraintVertical_bias="0.448">
 
         <TableRow
             android:id="@+id/r1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:weightSum="3">
 
             <include
                 android:id="@+id/r0c0"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <include
                 android:id="@+id/r0c1"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <include
                 android:id="@+id/r0c2"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
         </TableRow>
 
@@ -60,19 +72,29 @@
             android:id="@+id/r2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:weightSum="3">
 
             <include
                 android:id="@+id/r1c0"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <include
                 android:id="@+id/r1c1"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <include
                 android:id="@+id/r1c2"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
         </TableRow>
 
@@ -80,19 +102,29 @@
             android:id="@+id/r3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:weightSum="3">
 
             <include
                 android:id="@+id/r2c0"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <include
                 android:id="@+id/r2c1"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <include
                 android:id="@+id/r2c2"
-                layout="@layout/grid_cell" />
+                layout="@layout/grid_cell"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
         </TableRow>
 
