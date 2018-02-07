@@ -19,4 +19,6 @@ public enum Player {
     public int getDrawable(){return iconId;}
 
     public void setName(String name){this.name = name;}
+
+    public String toString(){return name;}
 }

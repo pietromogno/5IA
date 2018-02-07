@@ -4,4 +4,5 @@
     <string name="lbl_giocatore2">Nome giocatore 2</string>
     <string name="hint_giocatore">Nome giocatore</string>
     <string name="btn_inizia">Inizia</string>
+    <string name="imageDescription">X O Blank</string>
 </resources>

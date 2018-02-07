@@ -1,16 +1,15 @@
 package com.pag.tic_tac_toe;
-
-import java.util.Arrays;
 import java.util.Observable;
 import java.util.Random;
 
 public class Board extends Observable {
 
-    private final int size = 3;
-    Player p1, p2, current;
-    int[][] board;
+    private final int size;
+    private Player p1, p2, current;
+    private int[][] board;
 
-    public Board(String p1Name, String p2Name) {
+    public Board(int size,String p1Name, String p2Name) {
+        this.size = size;
         p1 = Player.PLAYER_ONE;
         p1.setName(p1Name);
         p2 = Player.PLAYER_TWO;
@@ -19,13 +18,17 @@ public class Board extends Observable {
         board = new int[this.size][this.size];
     }
 
-    public boolean update(int x, int y) {
-        if (board[x][y] == 0) {
-            board[x][y] = current.getDrawable();
+    public void updateBoard(int x, int y) {
+        if (board[y][x] == 0) {
+            board[y][x] = current.getDrawable();
             current = (current.equals(p1)) ? p2 : p1;
-            return true;
-        } else {
-            return false; //ou mona hai già cliccato la dio*
+            setChanged();
+            notifyObservers();
+            clearChanged();
         }
+    }
+
+    public int getDrawableId(int x, int y){
+        return board[y][x];
     }
 }
