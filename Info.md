@@ -6,3 +6,5 @@
 * Chat TCP 01/11/2017
 	* aggiornamento della grafica e correzioni di problemi 24/11/2017
 	* aggiornamento del readme 29/11/2017
+* Tic Tac Toe (Android) 08/02/2018
+	* creazione del progetto in data 07/02/2018
