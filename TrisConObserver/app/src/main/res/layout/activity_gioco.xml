@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/sfondo">
+
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="115dp">
+
+        <TextView
+            android:id="@+id/nome1"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="70dp"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/punteggio1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="70dp"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/nome2"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="70dp"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/punteggio2"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="70dp"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="135dp">
+
+        <ImageView
+            android:id="@+id/r1c1"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="15dp"/>
+
+        <ImageView
+            android:id="@+id/r1c2"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="5dp"/>
+
+        <ImageView
+            android:id="@+id/r1c3"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="5dp"/>
+
+    </GridLayout>
+
+    <GridLayout
+        android:layout_marginTop="7dp"
+        android:layout_width="match_parent"
+        android:layout_height="135dp">
+
+        <ImageView
+            android:id="@+id/r2c1"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="15dp"/>
+
+        <ImageView
+            android:id="@+id/r2c2"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="5dp"/>
+
+        <ImageView
+            android:id="@+id/r2c3"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="5dp"/>
+
+    </GridLayout>
+
+    <GridLayout
+        android:layout_marginTop="7dp"
+        android:layout_width="match_parent"
+        android:layout_height="135dp"
+        >
+
+        <ImageView
+            android:id="@+id/r3c1"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="15dp"/>
+
+        <ImageView
+            android:id="@+id/r3c2"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="5dp"/>
+
+        <ImageView
+            android:id="@+id/r3c3"
+            android:layout_width="125dp"
+            android:layout_height="135dp"
+            android:layout_marginLeft="5dp"/>
+
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/resetta"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="70dp"
+            android:backgroundTint="?android:attr/textColorHint"
+            android:text="Resetta" />
+
+        <Button
+            android:id="@+id/indietro"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="50dp"
+            android:backgroundTint="?android:attr/textColorHint"
+            android:text="Indietro" />
+    </GridLayout>
+</LinearLayout>
