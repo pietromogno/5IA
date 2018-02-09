@@ -9,18 +9,8 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
 
-    public void intelliComButton(View w){
-        w.setEnabled(false);
-        //startActivity(new Intent(this, Computer.class));
-    }
-
     public void personaButton(View w){
         startActivity(new Intent(this, Locale.class));
-    }
-
-    public void onlineButton(View w){
-        w.setEnabled(false);
-        //startActivity(new Intent(this, Computer.class));
     }
 
     @Override
