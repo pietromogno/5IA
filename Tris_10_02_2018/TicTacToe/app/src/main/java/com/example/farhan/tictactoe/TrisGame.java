@@ -24,8 +24,6 @@ public class TrisGame extends Observable {
     private int scP1, scP2;
     private ArrayList<int[]> winningPth;
 
-    private ArrayList<OpponentStatus> statuses;
-
     public TrisGame() {
         setGamePoint();
         startGame();
@@ -42,7 +40,6 @@ public class TrisGame extends Observable {
         gameOver = false;
         won = false;
         winningPth = new ArrayList<>();
-        statuses = new ArrayList<>();
         setChanged();
         if (turn == cellElement.X)
             notifyObservers(new Message(Message.invalidMove, turnIndication));
@@ -96,7 +93,6 @@ public class TrisGame extends Observable {
     }
 
     private void hasWon() {
-        statuses.clear();
         verticalControl();
         orizontalControl();
         firtDiagonalControl();
@@ -115,26 +111,14 @@ public class TrisGame extends Observable {
         } else {
             changeTurn();
             if (turn == cellElement.O) {
-                int px, py;
-                do {
-                    int[] pos = getMachineMove();
-                    px = pos[0];
-                    py = pos[1];
-                } while (!validateMove(px, py));
+                int pos = mossaMacchina();
+                int px = pos / 3;
+                int py = pos % 3;
                 setMove(px, py);
             }
         }
     }
 
-    private int[] getMachineMove() {
-        int temp = 0;
-        for (int i = 0; i < statuses.size(); i++) {
-            if (statuses.get(i).getSeedNumber() > temp && statuses.get(i).emptyPos.size() > 0) {
-                temp = i;
-            }
-        }
-        return statuses.get(temp).getEmptyPos();
-    }
 
     private void setMatchScore() {
         if (getTurn() == cellElement.X) {
@@ -168,21 +152,13 @@ public class TrisGame extends Observable {
         if (!isWon()) {
             for (int i = 0; !isGameOver() && i < 3; i++) {
                 int cnt = 0;
-                int seeds = 0;
-                ArrayList<int[]> emptyPos = new ArrayList<>();
                 winningPth.clear();
                 for (int j = 0; j < 3; j++) {
                     if (mg[j][i] == turn) {
                         cnt++;
                         winningPth.add(new int[]{j, i});
-                    } else if (mg[j][i] == cellElement.E) {
-                        emptyPos.add(new int[]{j, i});
-                    }
-                    if (mg[j][i] == cellElement.X) {
-                        seeds++;
                     }
                 }
-                statuses.add(new OpponentStatus(seeds, emptyPos));
                 won = gameOver = cnt == 3;
             }
         }
@@ -192,21 +168,13 @@ public class TrisGame extends Observable {
         if (!isWon()) {
             for (int i = 0; !isGameOver() && i < 3; i++) {
                 int cnt = 0;
-                int seeds = 0;
-                ArrayList<int[]> emptyPos = new ArrayList<>();
                 winningPth.clear();
                 for (int j = 0; j < 3; j++) {
                     if (mg[i][j] == turn) {
                         cnt++;
                         winningPth.add(new int[]{i, j});
-                    } else if (mg[i][j] == cellElement.E) {
-                        emptyPos.add(new int[]{i, j});
-                    }
-                    if (mg[i][j] == cellElement.X) {
-                        seeds++;
                     }
                 }
-                statuses.add(new OpponentStatus(seeds, emptyPos));
                 won = gameOver = cnt == 3;
             }
         }
@@ -217,20 +185,12 @@ public class TrisGame extends Observable {
         if (!isWon()) {
             winningPth.clear();
             int cnt = 0;
-            int seeds = 0;
-            ArrayList<int[]> emptyPos = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 if (mg[i][i] == turn) {
                     cnt++;
                     winningPth.add(new int[]{i, i});
-                } else if (mg[i][i] == cellElement.E) {
-                    emptyPos.add(new int[]{i, 2 - i});
-                }
-                if (mg[i][i] == cellElement.X) {
-                    seeds++;
                 }
             }
-            statuses.add(new OpponentStatus(seeds, emptyPos));
             won = gameOver = cnt == 3;
         }
     }
@@ -239,40 +199,171 @@ public class TrisGame extends Observable {
         if (!isWon()) {
             winningPth.clear();
             int cnt = 0;
-            int seeds = 0;
-            ArrayList<int[]> emptyPos = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 if (mg[i][2 - i] == turn) {
                     cnt++;
                     winningPth.add(new int[]{i, 2 - i});
-                } else if (mg[i][2 - i] == cellElement.E) {
-                    emptyPos.add(new int[]{i, 2 - i});
-                }
-                if (mg[i][2 - i] == cellElement.X) {
-                    seeds++;
                 }
             }
-            statuses.add(new OpponentStatus(seeds, emptyPos));
             won = gameOver = cnt == 3;
         }
     }
 
-    private class OpponentStatus {
-        private int seeds;
-        private ArrayList<int[]> emptyPos;
-
-        public OpponentStatus(int seeds, ArrayList<int[]> emptyPos) {
-            this.seeds = seeds;
-            this.emptyPos = emptyPos;
+    public int mossaMacchina() {
+        int pos = -1;
+        int contX, contO;
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            contX = 0;
+            contO = 0;
+            for (int j = 0; j < 3; j++) {
+                if (mg[i][j] == cellElement.X) {
+                    contX++;
+                }
+                if (mg[i][j] == cellElement.O) {
+                    contO++;
+                }
+            }
+            if (contO == 2 && contX == 0) {
+                for (int j = 0; j < 3 && pos < 0; j++) {
+                    if (mg[i][j] == cellElement.E) {
+                        pos = 3 * i + j;
+                    }
+                }
+            }
         }
-
-        public int getSeedNumber() {
-            return seeds;
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            contX = 0;
+            contO = 0;
+            for (int j = 0; j < 3; j++) {
+                if (mg[j][i] == cellElement.X) {
+                    contX++;
+                }
+                if (mg[j][i] == cellElement.O) {
+                    contO++;
+                }
+            }
+            if (contO == 2 && contX == 0) {
+                for (int j = 0; j < 3 && pos < 0; j++) {
+                    if (mg[j][i] == cellElement.E) {
+                        pos = 3 * j + i;
+                    }
+                }
+            }
         }
-
-        public int[] getEmptyPos() {
-            return emptyPos.get(0);
+        contX = 0;
+        contO = 0;
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            if (mg[i][i] == cellElement.X) {
+                contX++;
+            }
+            if (mg[i][i] == cellElement.O) {
+                contO++;
+            }
         }
-
+        if (contO == 2 && contX == 0) {
+            for (int i = 0; i < 3 && pos < 0; i++) {
+                if (mg[i][i] == cellElement.E) {
+                    pos = 4 * i;
+                }
+            }
+        }
+        contX = 0;
+        contO = 0;
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            if (mg[i][2 - i] == cellElement.X) {
+                contX++;
+            }
+            if (mg[i][2 - i] == cellElement.O) {
+                contO++;
+            }
+        }
+        if (contO == 2 && contX == 0) {
+            for (int i = 0; i < 3 && pos < 0; i++) {
+                if (mg[i][2 - i] == cellElement.E) {
+                    pos = 2 * (i + 1);
+                }
+            }
+        }
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            contX = 0;
+            contO = 0;
+            for (int j = 0; j < 3; j++) {
+                if (mg[i][j] == cellElement.X) {
+                    contX++;
+                }
+                if (mg[i][j] == cellElement.O) {
+                    contO++;
+                }
+            }
+            if (contX == 2 && contO == 0) {
+                for (int j = 0; j < 3 && pos < 0; j++) {
+                    if (mg[i][j] == cellElement.E) {
+                        pos = 3 * i + j;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            contX = 0;
+            contO = 0;
+            for (int j = 0; j < 3; j++) {
+                if (mg[j][i] == cellElement.X) {
+                    contX++;
+                }
+                if (mg[j][i] == cellElement.O) {
+                    contO++;
+                }
+            }
+            if (contX == 2 && contO == 0) {
+                for (int j = 0; j < 3 && pos < 0; j++) {
+                    if (mg[j][i] == cellElement.E) {
+                        pos = 3 * j + i;
+                    }
+                }
+            }
+        }
+        contX = 0;
+        contO = 0;
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            if (mg[i][i] == cellElement.X) {
+                contX++;
+            }
+            if (mg[i][i] == cellElement.O) {
+                contO++;
+            }
+        }
+        if (contX == 2 && contO == 0) {
+            for (int i = 0; i < 3 && pos < 0; i++) {
+                if (mg[i][i] == cellElement.E) {
+                    pos = 4 * i;
+                }
+            }
+        }
+        contX = 0;
+        contO = 0;
+        for (int i = 0; i < 3 && pos < 0; i++) {
+            if (mg[i][2 - i] == cellElement.X) {
+                contX++;
+            }
+            if (mg[i][2 - i] == cellElement.O) {
+                contO++;
+            }
+        }
+        if (contX == 2 && contO == 0) {
+            for (int i = 0; i < 3 && pos < 0; i++) {
+                if (mg[i][2 - i] == cellElement.E) {
+                    pos = 2 * (i + 1);
+                }
+            }
+        }
+        while (pos < 0) {
+            int i = (int) (Math.random() * 3);
+            int j = (int) (Math.random() * 3);
+            if (mg[i][j] == cellElement.E) {
+                pos = 3 * i + j;
+            }
+        }
+        return pos;
     }
+
 }
