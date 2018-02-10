@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/studente/Documenti/Io/Tris/C:\\Users\\Pietro\\Documents\\Tris\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-h720dp-v13\\values-h720dp-v13.xml",
+            "map": [
+                {
+                    "source": "/home/studente/Documenti/Io/Tris/C:\\Users\\Pietro\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-26.1.0.aar\\9d27fdcd595dc46fe126c3a7951585f2\\res\\values-h720dp-v13\\values-h720dp-v13.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "66",
+                        "endOffsets": "117"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "/home/studente/Documenti/Io/Tris/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-h720dp-v13/values-h720dp-v13.xml",
+            "map": [
+                {
+                    "source": "/home/studente/.gradle/caches/transforms-1/files-1.1/appcompat-v7-26.1.0.aar/ca46579b0a2ccbed011a013bce3d4a74/res/values-h720dp-v13/values-h720dp-v13.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "66",
+                        "endOffsets": "117"
+                    }
+                }
+            ]
+        }
+    ]
+}
