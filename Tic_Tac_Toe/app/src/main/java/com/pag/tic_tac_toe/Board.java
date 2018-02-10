@@ -36,7 +36,7 @@ public class Board extends Observable {
         int y = move[0];
         int x = move[1];
         if (board[y][x] == 0) {
-            board[x][y] = drawableId;
+            board[y][x] = drawableId;
             turn++;
             setChanged();
             notifyObservers();
@@ -44,7 +44,6 @@ public class Board extends Observable {
         }
     }
 
-    int getSize(){return size;}
 
     int getTurn() {
         return turn;

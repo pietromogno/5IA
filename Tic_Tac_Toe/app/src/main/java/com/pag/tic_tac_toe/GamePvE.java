@@ -36,7 +36,7 @@ public class GamePvE extends AppCompatActivity implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         boolean isAiTurn = Ai.isAiTurn();
-        lastClicked.setImageDrawable(getDrawable(board.));
+        //lastClicked.setImageDrawable(getDrawable(board.));
         if(board.getTurn()>4){
 
         }

@@ -18,20 +18,19 @@ public class GamePvP extends AppCompatActivity implements Observer {
     int size = 3;
     private ImageView lastClicked;
     private Player current;
-    //private int lastMoveX, lastMoveY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        //lastMoveX = 0;
-        //lastMoveY = 0;
         Bundle bundle = getIntent().getExtras();
         board = new Board(size, bundle.getString("p1Name"), bundle.getString("p2Name"));
         board.addObserver(this);
+
         grid = findViewById(R.id.tictactoe);
-        current = current = (new Random().nextBoolean()) ? board.getP1():board.getP2();
+
+        current  = (new Random().nextBoolean()) ? board.getP1():board.getP2();
         Toast.makeText(this, "Tocca a " + current.getName(), Toast.LENGTH_SHORT).show();
     }
 
@@ -49,7 +48,7 @@ public class GamePvP extends AppCompatActivity implements Observer {
                 }
             }
         }
-        current = (current.equals(board.getP1()))?current = board.getP2():board.getP1();
+        current = (current.equals(board.getP1()))?board.getP2():board.getP1();
         Toast.makeText(this, "Tocca a " + current.getName(), Toast.LENGTH_SHORT).show();
     }
 
@@ -91,21 +90,29 @@ public class GamePvP extends AppCompatActivity implements Observer {
     public boolean check(Player current) {
         int idCheck = current.getDrawable();
         int[][] values = board.getBoard();
-        //check rows
-        for (int i = 0; i < size; i++) {
-            if (values[i][0] == idCheck)
-                return values[i][0] == values[i][1] && values[i][1] == values[i][2];
+        boolean isFinished = false;
+        for(int y = 0; y < size; y++){
+            int x = 0;
+            while(x < 3 && values[y][x]  == idCheck){ //rows
+                x++;
+            }
+            isFinished = (x == 3);
+            x = 0;
+            while(x < 3 && values[x][y] == idCheck && !isFinished){
+                x++;
+            }
+            isFinished = (x == 3);
         }
-        //check columns
-        for (int i = 0; i < size; i++) {
-            if (values[0][i] == idCheck)
-                return values[0][i] == values[1][i] && values[1][i] == values[2][i];
+        int dAdBs = 0;
+        int dAsBd = 0;
+        for(int i = 0 ; i < 3 ; i ++){
+            if(values[i][i] == idCheck){
+                dAdBs++;
+            }
+            if(values[i][3-i-1] == idCheck){
+                dAsBd++;
+            }
         }
-        //check diagonals
-        if (values[0][0] == idCheck)
-            return values[0][0] == values[1][1] && values[1][1] == values[2][2];
-        if (values[0][2] == idCheck)
-            return values[0][2] == values[1][1] && values[1][1] == values[2][0];
-        return false;
+        return isFinished || dAdBs == 3 || dAsBd == 3;
     }
 }
