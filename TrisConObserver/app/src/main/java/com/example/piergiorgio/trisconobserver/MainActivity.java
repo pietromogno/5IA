@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button inizia;
+    Button inizia, indietro;
     String nome1, nome2;
     EditText viewnome1, viewnome2;
     Intent cambiaFase;
@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         viewnome1 = (EditText) findViewById(R.id.nome1);
         viewnome2 = (EditText) findViewById(R.id.nome2);
         inizia = (Button) findViewById(R.id.inizia);
+        indietro = (Button) findViewById(R.id.indietro);
         inizia.setOnClickListener(View -> {
             nome1 = viewnome1.getText().toString();
             nome2 = viewnome2.getText().toString();
@@ -43,5 +44,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Inserire entrambi i nomi dei giocatori",Toast.LENGTH_SHORT).show();
             }
         });
+        indietro.setOnClickListener(View -> {
+            cambiaFase = new Intent(this, Scelta.class);
+            startActivity(cambiaFase);
+        });
     }
+
 }

@@ -23,14 +23,20 @@ public class Gioco extends AppCompatActivity implements Observer {
     TextView giocatore1, giocatore2;
     TextView punteggio1, punteggio2;
     Button indietro, resetta;
+    boolean conCpu;
     String nome1, nome2;
     Tris t;
+    ImageView [][] caselle;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gioco);
         nome1 = getIntent().getStringExtra("nome1");
         nome2 = getIntent().getStringExtra("nome2");
+        if(nome2.equals("CPU")){
+            conCpu = true;
+
+        }
         this.indietro = (Button) findViewById(R.id.indietro);
         this.resetta = (Button) findViewById(R.id.resetta);
         giocatore1 = (TextView) findViewById(R.id.nome1);
@@ -50,7 +56,8 @@ public class Gioco extends AppCompatActivity implements Observer {
         this.r3c1 = (ImageView) findViewById(R.id.r3c1);
         this.r3c2 = (ImageView) findViewById(R.id.r3c2);
         this.r3c3 = (ImageView) findViewById(R.id.r3c3);
-        t = new Tris();
+        caselle = new ImageView[][] {{r1c1, r1c2,r1c3},{r2c1, r2c2, r2c3},{r3c1, r3c2, r3c3}};
+        t = new Tris(conCpu);
         t.addObserver(this);
         settaListener();
     }
@@ -84,7 +91,12 @@ public class Gioco extends AppCompatActivity implements Observer {
             t.azioneListener(r3c3, 2, 2);
         });
         indietro.setOnClickListener(View -> {
-            Intent cambiaFase = new Intent(this, MainActivity.class);
+            Intent cambiaFase;
+            if(!nome2.equals("CPU")){
+                cambiaFase= new Intent(this, MainActivity.class);
+            } else {
+                cambiaFase = new Intent(this, MainCpu.class);
+            }
             startActivity(cambiaFase);
         });
         resetta.setOnClickListener(View -> {
@@ -117,7 +129,12 @@ public class Gioco extends AppCompatActivity implements Observer {
     public void update(Observable o, Object arg) {
         MioOggetto m = (MioOggetto) arg;
         if(m.getVincitore() == 0){
-            settaImmagine(m.getImg(), m.getTurno());
+                settaImmagine(m.getImg(), m.getTurno());
+        }else if(m.getVincitore() == 4){ //turno conseguito dalla CPU
+            new CountDownTimer(1500, 1000) {
+                public void onTick(long millisUntilFinished) {}
+                public void onFinish() {t.azioneListener(caselle[t.getRiga()][t.getColonna()], t.getRiga(), t.getColonna());}
+            }.start();
         } else if(m.getVincitore() == 3){
             new CountDownTimer(1500, 1000) {
                 public void onTick(long millisUntilFinished) {}

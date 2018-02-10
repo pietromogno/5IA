@@ -1,9 +1,8 @@
 package com.example.piergiorgio.trisconobserver;
 
-import android.util.Log;
 import android.widget.ImageView;
-
 import java.util.Observable;
+import java.util.Random;
 
 /**
  * Created by Piergiorgio Favaretto
@@ -11,43 +10,49 @@ import java.util.Observable;
 
 public class Tris extends Observable {
 
-    boolean vinto;
-    int turno, piene;
+    int turno, piene, gturnoiniz;
     int punti1, punti2;
-    int giocate[][]; //matrice che tiene conto delle caselle giocate e da che giocatore
+    int riga, colonna;
+    int giocate[][];
+    boolean conCpu;
+    Random r;
 
-    Tris(){
-        vinto = false;
-        turno = 1;
+    Tris(boolean conCpu){
+        gturnoiniz = turno = 1;
         punti1 = punti2 = 0;
         giocate = new int [3][3];
+        this.conCpu = conCpu;
+        if(conCpu) r = new Random();
     }
 
-    void azioneListener(ImageView img, int riga, int colonna){ //serie di azioni che compie il Listner di ogni mage view
-        if(giocate[riga][colonna] == 0){ // cella vnon giocata
+    void azioneListener(ImageView img, int riga, int colonna){
+        if(giocate[riga][colonna] == 0){
+            //inserisco nella mia griglia di controllo il
+            //giocatore che ha giocato quella posizione
             giocate[riga][colonna] = turno;
             setChanged(); 
-            notifyObservers(new MioOggetto(turno, img)); //notivica la mossa per l'aggiunta del segno
-            int n = controlla(); // controlla se qualche giocatore ha vinto
+            notifyObservers(new MioOggetto(turno, img));
+            int n = controlla();
             piene++;
-            if(n == 1){ //giocatore 1
+            if(n == 1){ //ha vinto il giocatore 1
                 punti1++;
                 setChanged();
                 notifyObservers(new MioOggetto(1));
                 resetta(0);
-            } else if(n == 2){  //giocatore 2
+            } else if(n == 2){ //ha vinto il giocatore 2
                 punti2++;
                 setChanged();
                 notifyObservers(new MioOggetto(2));
                 resetta(0);
             }
-            if(piene == 9){ //nessun vincitore ma tabella piena
+            if(piene == 9){ //nessun vincitore, tabella piena
                 setChanged();
                 notifyObservers(new MioOggetto(3));
                 resetta(0);
-            } else {
+            } else { //nessun vincitore, cambia il turno
                 if(turno == 1){
                     turno = 2;
+                    if(conCpu)azioneRandom();
                 } else {
                     turno = 1;
                 }
@@ -55,53 +60,68 @@ public class Tris extends Observable {
         }
     }
 
+    private void azioneRandom(){ //formulo una mossa a caso
+        boolean trovato = false;
+        while(!trovato){
+            riga = r.nextInt(3);
+            colonna = r.nextInt(3);
+            if(giocate[riga][colonna] == 0){
+                trovato = !trovato;
+                setChanged();
+                notifyObservers(new MioOggetto(4));
+            }
+        }
+    }
+
+    int getRiga(){
+        return riga;
+    }
+
+    int getColonna(){
+        return colonna;
+    }
+
     private int controlla(){
         int cnt;
-        for(int k = 1; k < 3 && !vinto; k++)  { //righe
+        for(int k = 1; k < 3; k++) { //ciclo due volte per controllare entrambi i giocatori
+            //controllo le righe
             for (int i = 0; i < 3; i++) {
                 cnt = 0;
                 for (int j = 0; j < 3; j++) {
                     if (giocate[i][j] == k) cnt++;
                 }
                 if (cnt == 3) {
-                    vinto = true;
                     return k;
                 }
             }
-            if (!vinto) { //colonne
-                for (int i = 0; i < 3; i++) {
-                    cnt = 0;
-                    for (int j = 0; j < 3; j++) {
-                        if (giocate[j][i] == k) cnt++;
-                    }
-                    if (cnt == 3) {
-                        vinto = true;
-                        return k;
-                    }
-                }
-            }
-            if (!vinto) {
+            //controllo le colonne
+            for (int i = 0; i < 3; i++) {
                 cnt = 0;
-                for (int i = 0; i < 3; i++) { //diagonale da sinistra a destra
-                    if (giocate[i][i] == k) cnt++;
+                for (int j = 0; j < 3; j++) {
+                    if (giocate[j][i] == k) cnt++;
                 }
                 if (cnt == 3) {
                     return k;
-                } else {
-                    cnt = 0;
-                    for (int j = 0; j < 3; j++) {  //diagonale da destra a sinistra 
-                        for (int i = 2; i >= 0; i--) {
-                            if (giocate[j][i] == k) cnt++;
-                            Log.d("String", cnt + "");
-                        }
-                        if (cnt == 3) {
-                            return k;
-                        }
-                    }
                 }
             }
+            //controllo la diagonale 1
+            cnt = 0;
+            if (giocate[0][0] == k) cnt++;
+            if (giocate[1][1] == k) cnt++;
+            if (giocate[2][2] == k) cnt++;
+            if (cnt == 3) {
+                return k;
+            }
+            //controllo la diagonale 2
+            cnt = 0;
+            if (giocate[0][2] == k) cnt++;
+            if (giocate[1][1] == k) cnt++;
+            if (giocate[2][0] == k) cnt++;
+            if (cnt == 3) {
+                return k;
+            }
         }
-        return 0;  //nessun vincitore
+        return 0; //nessun vincitore
     }
 
     int getPunti1(){
@@ -112,12 +132,14 @@ public class Tris extends Observable {
         return punti2;
     }
 
-    void resetta(int mode){ //resetta parametri
-        if(mode == 1){ //maniene il turno quando è schiacciato il bottone resetta
-            if(turno == 1)turno = 2;
-            else turno = 1;
+    void resetta(int mode){ //resetta tutte le variabili
+        if(mode == 1){ //se si schiaccia resetta turno, fa ripartire dal giocatore che ha iniziato a giocarlo
+            turno = gturnoiniz;
+            if(conCpu) { //se si gioca contro la CPU e deve iniziare lei la faccio partire
+                setChanged();
+                notifyObservers(new MioOggetto(4));
+            }
         }
-        vinto = false;
         piene = 0;
         giocate = new int [3][3];
     }
@@ -126,15 +148,16 @@ public class Tris extends Observable {
 
 class MioOggetto{
 
-    int turno, vincitore;
-    ImageView img;
+    private int turno, vincitore;
+    private int riga, colonna;
+    private ImageView img;
 
     MioOggetto(int vincitore){ //oggetto invocato per il vincitore
         this.vincitore = vincitore;
     }
 
 
-    MioOggetto(int turno, ImageView img){ //oggetto invocato per mostrare la mossa
+    MioOggetto(int turno, ImageView img){ //oggetto invocato per inserire la mossa
         vincitore = 0;
         this.turno = turno;
         this.img = img;

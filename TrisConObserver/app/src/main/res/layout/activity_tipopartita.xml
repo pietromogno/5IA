@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/sfondomain">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:text="Benvenuto in TRIS-X"
+        android:textAlignment="center"
+        android:textSize="40sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/giocatori"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:backgroundTint="?android:attr/textColorHint"
+        android:textSize="18sp"
+        android:text="1 vs 1"
+        android:textColorLink="@android:color/background_dark"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/cpu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:backgroundTint="?android:attr/textColorHint"
+        android:textSize="18sp"
+        android:text="1 vs CPU"
+        android:textColorLink="@android:color/background_dark"
+        android:textStyle="bold" />
+
+</LinearLayout>
