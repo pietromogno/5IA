@@ -74,19 +74,25 @@
                 android:id="@+id/btn00"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
 
             <Button
                 android:id="@+id/btn01"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
 
             <Button
                 android:id="@+id/btn02"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
         </TableRow>
 
         <TableRow android:layout_weight="1">
@@ -95,19 +101,25 @@
                 android:id="@+id/btn10"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
 
             <Button
                 android:id="@+id/btn11"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
 
             <Button
                 android:id="@+id/btn12"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
         </TableRow>
 
         <TableRow android:layout_weight="1">
@@ -116,19 +128,25 @@
                 android:id="@+id/btn20"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
 
             <Button
                 android:id="@+id/btn21"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
 
             <Button
                 android:id="@+id/btn22"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="36sp" />
+                android:textSize="36sp"
+                android:backgroundTint="@color/sfondoBtn"
+                />
         </TableRow>
 
     </TableLayout>
