@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Tris Vegetale</string>
+    <string name="eTurno" />
+    <string name="pareggio" />
+    <string name="nonLibera" />
+    <string name="haVinto" />
+    <string name="restartButton">Ricomincia</string>
+    <string name="nonTurno" />
+    <string name="seleziona">Seleziona modalità:</string>
+    <string name="computer">SINGOLA</string>
+    <string name="vs">DOPPIA</string>
+</resources>
