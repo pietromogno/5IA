@@ -3,6 +3,7 @@ package com.example.enrico.tris;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,19 +13,27 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
-public class CampoTrisActivity extends AppCompatActivity  implements Observer {
+public class CampoTrisActivity extends AppCompatActivity  implements Observer, View.OnClickListener {
 
     private ViewGroup griglia;
     private TextView vX,vO;
     private int vittorieX,vittorieO;
     private boolean iniziaX,is1vs1;
     private GiocoTris gioco;
+    private Button restart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_campo_tris);
+
+        restart=findViewById(R.id.restart);
+        restart.setOnClickListener(this);
+
+        griglia=findViewById(R.id.griglia);
+
+        boolean isFinita=false;
 
         HashMap<Integer,Character>colorate=new HashMap<>();
         if(savedInstanceState!=null){
@@ -34,19 +43,26 @@ public class CampoTrisActivity extends AppCompatActivity  implements Observer {
             vittorieO=savedInstanceState.getInt("vittorieO");
             GiocoTris giocoTemp=(GiocoTris)savedInstanceState.getSerializable("gioco");
             colorate=giocoTemp.getStatoTris().getColorate();
+            if(savedInstanceState.getBoolean("isFinita")){
+                isFinita=true;
+                restart.setBackgroundColor(Color.GRAY);
+            }else{
+                restart.setClickable(false);
+                restart.setBackgroundColor(Color.LTGRAY);
+            }
             gioco=new GiocoTris(is1vs1,this);
             gioco.setContMosse(giocoTemp.getContMosse());
             gioco.setStatoTris(giocoTemp.getStatoTris());
             gioco.setTurnoX(giocoTemp.getTurnoX());
         }else{
+            restart.setClickable(false);
+            restart.setBackgroundColor(Color.LTGRAY);
             is1vs1=getIntent().getBooleanExtra("is1vs1",true);
             vittorieX=0;
             vittorieO=0;
             iniziaX=Math.random()<0.5;
             gioco=new GiocoTris(is1vs1,this);
         }
-
-        griglia=findViewById(R.id.griglia);
 
         vX=findViewById(R.id.vittorieX);
         vO=findViewById(R.id.vittorieO);
@@ -58,6 +74,11 @@ public class CampoTrisActivity extends AppCompatActivity  implements Observer {
             Button b= ((Button)griglia.findViewWithTag(i+""));
             b.setOnClickListener(gioco);
             if(colorate.containsKey(i))b.setBackgroundColor(colorate.get(i)=='X'? Color.parseColor("#FF0000"):Color.parseColor("#00FF00"));
+        }
+        if(isFinita){
+            for(int i=0;i<9;i++){
+                ((Button)griglia.findViewWithTag(i+"")).setClickable(false);
+            }
         }
         if(savedInstanceState==null)gioco.gioca(iniziaX);
 
@@ -81,21 +102,31 @@ public class CampoTrisActivity extends AppCompatActivity  implements Observer {
                 Toast.makeText(CampoTrisActivity.this,"Vince O",Toast.LENGTH_LONG).show();
                 vO.setText("Vittorie O:"+vittorieO);
             }
-            iniziaX=!iniziaX;
-            inizializzaGriglia();
-            gioco.gioca(iniziaX);
+            restart.setClickable(true);
+            restart.setBackgroundColor(Color.GRAY);
+            for(int i=0;i<9;i++){
+                ((Button)griglia.findViewWithTag(i+"")).setClickable(false);
+            }
         }else if(op.charAt(0)=='P'){
             Toast.makeText(CampoTrisActivity.this,"Pareggio",Toast.LENGTH_LONG).show();
-            iniziaX=!iniziaX;
-            inizializzaGriglia();
-            gioco.gioca(iniziaX);
+            restart.setClickable(true);
+            restart.setBackgroundColor(Color.GRAY);
+            for(int i=0;i<9;i++){
+                ((Button)griglia.findViewWithTag(i+"")).setClickable(false);
+            }
         }
     }
 
-    public void inizializzaGriglia(){
+    @Override
+    public void onClick(View view){
+        iniziaX=!iniziaX;
         for(int i=0;i<9;i++){
             ((Button)griglia.findViewWithTag(i+"")).setBackgroundResource(R.drawable.background_button);
+            ((Button)griglia.findViewWithTag(i+"")).setClickable(true);
         }
+        gioco.gioca(iniziaX);
+        restart.setClickable(false);
+        restart.setBackgroundColor(Color.LTGRAY);
     }
 
     @Override
@@ -109,5 +140,6 @@ public class CampoTrisActivity extends AppCompatActivity  implements Observer {
         savedInstanceState.putInt("vittorieX",vittorieX);
         savedInstanceState.putInt("vittorieO",vittorieO);
         savedInstanceState.putSerializable("gioco",gioco);
+        savedInstanceState.putBoolean("isFinita",restart.isClickable());
     }
 }

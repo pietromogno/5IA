@@ -10,13 +10,15 @@
     android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginTop="60dp"
     android:columnCount="3"
     android:rowCount="3"
     android:id="@+id/griglia">
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -25,8 +27,8 @@
         android:tag="0"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -35,8 +37,8 @@
         android:tag="1"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -45,8 +47,8 @@
         android:tag="2"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -55,8 +57,8 @@
         android:tag="3"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -65,8 +67,8 @@
         android:tag="4"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -75,8 +77,8 @@
         android:tag="5"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -85,8 +87,8 @@
         android:tag="6"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -95,8 +97,8 @@
         android:tag="7"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="2dp"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
@@ -111,11 +113,24 @@
     <TextView
         android:id="@+id/vittorieX"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/xColor"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/vittorieO"/>
+        android:id="@+id/vittorieO"
+        android:layout_gravity="center"
+        android:textColor="@color/yColor"/>
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="@string/restart"
+        android:id="@+id/restart"/>
 
 </LinearLayout>

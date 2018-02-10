@@ -1,8 +1,5 @@
 package com.example.enrico.tris;
 
-import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
