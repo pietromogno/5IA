@@ -17,7 +17,7 @@ public class ActivityTwo extends AppCompatActivity{
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
         });
-        if(getIntent().getStringExtra("winner").equals("none")) text.setText("PAREGGIO");
+        if(getIntent().getStringExtra("winner").equals("none")) text.setText("PAREGGIO!");
         else text.setText("WIN il Giocatore "+getIntent().getStringExtra("winner"));
     }
 }
