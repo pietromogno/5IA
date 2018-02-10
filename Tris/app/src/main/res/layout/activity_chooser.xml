@@ -50,13 +50,32 @@
             android:text="@string/easy" />
 
         <Button
-            android:id="@+id/difficultBtn"
+            android:id="@+id/mediumBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:tag="difficult"
-            android:text="@string/difficult" />
+            android:tag="medium"
+            android:text="@string/medium" />
+
+        <Button
+        android:id="@+id/difficultBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:tag="difficult"
+        android:text="@string/difficult" />
+
+        <Button
+            android:id="@+id/extremeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:tag="extreme"
+            android:text="@string/extreme" />
+
     </LinearLayout>
 
     <LinearLayout

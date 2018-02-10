@@ -50,8 +50,14 @@ public class MainActivity extends AppCompatActivity {
             case "easy":
                 c.addObserver(new Dati(getIntent().getStringExtra("giocatore"), "Intelligenza artificiale", "easy"));
                 break;
+            case "medium":
+                c.addObserver(new Dati(getIntent().getStringExtra("giocatore"), "Intelligenza artificiale", "medium"));
+                break;
             case "difficult":
                 c.addObserver(new Dati(getIntent().getStringExtra("giocatore"), "Intelligenza artificiale", "difficult"));
+                break;
+            case "extreme":
+                c.addObserver(new Dati(getIntent().getStringExtra("giocatore"), "Intelligenza artificiale", "extreme"));
                 break;
         }
 
@@ -69,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         }
         dismiss = new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                c.deleteObservers();
+                dialog.dismiss();
                 finish();
             }
         };

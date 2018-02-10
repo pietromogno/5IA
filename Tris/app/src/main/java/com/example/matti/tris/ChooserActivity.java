@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 public class ChooserActivity extends AppCompatActivity {
 
     @Override
@@ -22,9 +24,11 @@ public class ChooserActivity extends AppCompatActivity {
         final LinearLayout startGame = findViewById(R.id.startLayout);
         startGame.setVisibility(View.INVISIBLE);
         final Button manual = findViewById(R.id.manualBtn);
+        Button difficult = findViewById(R.id.difficultBtn);
+        Button extreme = findViewById(R.id.extremeBtn);
         final EditText giocatore2 = findViewById(R.id.player2);
         Button easy = findViewById(R.id.easyBtn);
-        Button difficult = findViewById(R.id.difficultBtn);
+        Button medium = findViewById(R.id.mediumBtn);
         ImageView logo= findViewById(R.id.logo);
 
         Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.zoom);
@@ -54,7 +58,9 @@ public class ChooserActivity extends AppCompatActivity {
             }
         };
         easy.setOnClickListener(click);
+        medium.setOnClickListener(click);
         difficult.setOnClickListener(click);
+        extreme.setOnClickListener(click);
         manual.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View mainView) {

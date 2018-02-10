@@ -13,4 +13,6 @@
     <string name="ai">Uomo vs AI</string>
     <string name="easy">Facile</string>
     <string name="difficult">Difficile</string>
+    <string name="medium">Media</string>
+    <string name="extreme">Estrema</string>
 </resources>
