@@ -1,10 +1,10 @@
 package com.pag.tic_tac_toe;
 
-import android.graphics.drawable.Drawable;
-
 public enum Player {
 
-    PLAYER_ONE("",'X',R.drawable.cross),PLAYER_TWO("",'O', R.drawable.circle);
+    PLAYER_ONE("",'X',R.drawable.cross),
+    PLAYER_TWO("",'O', R.drawable.circle),
+    PLAYER_NONE("",' ',R.layout.grid_cell);
 
     Player (String name, char symbol, int iconId){
         this.symbol = symbol;
@@ -25,4 +25,8 @@ public enum Player {
     public void setName(String name){this.name = name;}
 
     public String toString(){return name;}
+
+    public boolean equals(Player other){
+        return other.getDrawable() == this.getDrawable();
+    }
 }

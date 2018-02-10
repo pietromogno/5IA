@@ -5,4 +5,12 @@
     <string name="hint_giocatore">Nome giocatore</string>
     <string name="btn_inizia">Inizia</string>
     <string name="imageDescription">X O Blank</string>
+    <string name="unsupportedException">Metodo non ancora implementato</string>
+    <string name="pvp">P vs P</string>
+    <string name="pve">P vs E</string>
+    <string name="mode">modalità</string>
+    <string-array name="aiOptions">
+        <item>Table Lookup</item>
+        <item>Euristico</item>
+    </string-array>
 </resources>

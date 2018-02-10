@@ -12,5 +12,5 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/imageDescription"
         android:padding="15dp"
-        app:srcCompat="?android:attr/colorBackground" />
+        app:srcCompat="@drawable/empty" />
 </FrameLayout>
