@@ -1,0 +1,7 @@
+TRIS IN ANDROID
+
+Il progetto è stato sviluppato secondo modello MVC, consiste di un pakage controller che gestisce il flusso di informazioni tgra le viste e il modello, un pakage per i modelli contenente "Board" classe principale che utilizza l'oggetto "Player" costituito dai giocatori "X" e "O" e l'oggetto Cell che rappresenta i bottoni che costituiscono il campo di gioco.
+
+La parte XML è composta di una vista tris, formata da un grid di bottoni 3 x 3 e due label, atte alla comunicazione del vincitore.
+
+Inoltre c'è un file di menu che serve per resettare il gioco ed un eventuale modalità contro il computer.
