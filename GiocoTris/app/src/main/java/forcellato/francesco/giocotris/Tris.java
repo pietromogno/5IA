@@ -89,108 +89,90 @@ public class Tris extends Observable {
         }
     }
 
+    private int[] getRigaColonna(giocatore b){
+        int[] ris = new int[2];
+        ris[0] = -1;
+        ris[1] = -1;
+        int h = 0;
+        //per riga
+        for (int i = 0; i < DEFAULT && ris[0] == -1; i++) {
+            h = 0;
+            for (int j = 0; j < DEFAULT && ris[0] == -1; j++) {
+                if (matrix[i][j] == b) {
+                    h++;
+                }
+            }
+            if (h == 2) {
+                for (int j = 0; j < DEFAULT && ris[0] == -1; j++) {
+                    if (matrix[i][j] == giocatore.vuoto) {
+                        ris[0] = i;
+                        ris[1] = j;
+                    }
+                }
+            }
+        }
+        //per colonna
+        for (int i = 0; i < DEFAULT && ris[0] == -1; i++) {
+            h = 0;
+            for (int j = 0; j < DEFAULT && ris[0] == -1; j++) {
+                if (matrix[j][i] == b) {
+                    h++;
+                }
+            }
+            if (h == 2) {
+                for (int j = 0; j < DEFAULT; j++) {
+                    if (matrix[j][i] == giocatore.vuoto) {
+                        ris[0] = j;
+                        ris[1] = i;
+                    }
+                }
+            }
+        }
+        //per diagonale 1
+        h = 0;
+        for (int i = 0; i < DEFAULT && ris[0] == -1; i++) {
+            if (matrix[i][i] == b) {
+                h++;
+            }
+        }
+        if (h == 2) {
+            for (int i = 0; i < DEFAULT && ris[0] == -1; i++) {
+                if (matrix[i][i] == giocatore.vuoto) {
+                    ris[0] = i;
+                    ris[1] = i;
+                }
+            }
+        }
+        //per diagonale 2
+        h = 0;
+        for (int i = DEFAULT - 1; i >= 0 && ris[0] == -1; i--) {
+            if (matrix[(DEFAULT - 1) - i][i] == b) {
+                h++;
+            }
+        }
+        if (h == 2) {
+            for (int i = DEFAULT - 1; i >= 0 && ris[0] == -1; i--) {
+                if (matrix[(DEFAULT - 1) - i][i] == giocatore.vuoto) {
+                    ris[0] = (DEFAULT - 1) - i;
+                    ris[1] = i;
+                }
+            }
+        }
+        return ris;
+    }
+
     private void giocaMossa() {
         if (mosse < 9) {
             int riga = -1, colonna = -1;
-            int h = 0;
             giocatore avversario = g == giocatore.giocatore1 ? giocatore.giocatore2 : giocatore.giocatore1;
             //per riga
-            for (int i = 0; i < DEFAULT && riga == -1; i++) {
-                h = 0;
-                for (int j = 0; j < DEFAULT && riga == -1; j++) {
-                    if (matrix[i][j] == avversario) {
-                        h++;
-                    }
-                }
-                if (h == 2) {
-                    for (int j = 0; j < DEFAULT && riga == -1; j++) {
-                        if (matrix[i][j] == giocatore.vuoto) {
-                            riga = i;
-                            colonna = j;
-                        }
-                    }
-                }
-            }
-            //per colonna
-            for (int i = 0; i < DEFAULT && riga == -1; i++) {
-                h = 0;
-                for (int j = 0; j < DEFAULT && riga == -1; j++) {
-                    if (matrix[j][i] == avversario) {
-                        h++;
-                    }
-                }
-                if (h == 2) {
-                    for (int j = 0; j < DEFAULT; j++) {
-                        if (matrix[j][i] == giocatore.vuoto) {
-                            riga = j;
-                            colonna = i;
-                        }
-                    }
-                }
-            }
-            //per diagonale 1
-            h = 0;
-            for (int i = 0; i < DEFAULT && riga == -1; i++) {
-                if (matrix[i][i] == avversario) {
-                    h++;
-                }
-            }
-            if (h == 2) {
-                for (int i = 0; i < DEFAULT && riga == -1; i++) {
-                    if (matrix[i][i] == giocatore.vuoto) {
-                        riga = i;
-                        colonna = i;
-                    }
-                }
-            }
-            //per diagonale 2
-            h = 0;
-            for (int i = DEFAULT - 1; i >= 0 && riga == -1; i--) {
-                if (matrix[(DEFAULT - 1) - i][i] == avversario) {
-                    h++;
-                }
-            }
-            if (h == 2) {
-                for (int i = DEFAULT - 1; i >= 0 && riga == -1; i--) {
-                    if (matrix[(DEFAULT - 1) - i][i] == giocatore.vuoto) {
-                        riga = (DEFAULT - 1) - i;
-                        colonna = i;
-                    }
-                }
-            }
-            //cerca elementi vicini
-            if (riga == -1) {
-                for (int i = 0; i < DEFAULT; i++) {
-                    for (int j = 0; j < DEFAULT; j++) {
-                        if (matrix[i][j] == g) {
-                            if (i - 1 >= 0 && matrix[i - 1][j] == giocatore.vuoto) {
-                                riga = i - 1;
-                                colonna = j;
-                            } else if (i + 1 < DEFAULT && matrix[i + 1][j] == giocatore.vuoto) {
-                                riga = i + 1;
-                                colonna = j;
-                            } else if (j - 1 >= 0 && matrix[i][j - 1] == giocatore.vuoto) {
-                                riga = i;
-                                colonna = j - 1;
-                            } else if (j + 1 < DEFAULT && matrix[i][j + 1] == giocatore.vuoto) {
-                                riga = i;
-                                colonna = j + 1;
-                            } else if (i - 1 >= 0 && j - 1 >= 0 && matrix[i - 1][j - 1] == giocatore.vuoto) {
-                                riga = i - 1;
-                                colonna = j - 1;
-                            } else if (i - 1 >= 0 && j + 1 < DEFAULT && matrix[i - 1][j + 1] == giocatore.vuoto) {
-                                riga = i - 1;
-                                colonna = j + 1;
-                            } else if (i + 1 < DEFAULT && j - 1 >= 0 && matrix[i + 1][j - 1] == giocatore.vuoto) {
-                                riga = i + 1;
-                                colonna = j - 1;
-                            } else if (i + 1 < DEFAULT && j + 1 < DEFAULT && matrix[i + 1][j + 1] == giocatore.vuoto) {
-                                riga = i + 1;
-                                colonna = j + 1;
-                            }
-                        }
-                    }
-                }
+            int[] h= getRigaColonna(g);
+            riga=h[0];
+            colonna=h[1];
+            if(riga == -1){
+                h= getRigaColonna(avversario);
+                riga=h[0];
+                colonna=h[1];
             }
             if (riga == -1) {
 
