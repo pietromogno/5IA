@@ -1,8 +1,15 @@
 package com.example.enrico.tris;
 
+import android.graphics.Color;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.Serializable;
 import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by Enrico on 04/02/2018.
