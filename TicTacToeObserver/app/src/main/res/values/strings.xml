@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">GiocoTris</string>
+    <string name="newGame">new Game</string>
+    <string name="g1">nome Giocatore 1</string>
+    <string name="g2">nome Giocatore 2</string>
+    <string name="comincia2">Gioca 1 vs 1</string>
+    <string name="comincia1">Gioca 1 vs Computer</string>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/nomeG1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/g1"/>
+    <EditText
+        android:id="@+id/nomeG2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/g2"/>
+    <Button
+        android:id="@+id/btnGioca1Vs1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/comincia2"/>
+    <Button
+        android:id="@+id/btnGiocaVsComputer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/comincia1"/>
+</LinearLayout>
